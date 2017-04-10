@@ -1,0 +1,2529 @@
+
+
+
+
+***************************************************************************************************
+***************************************************************************************************
+objects
+
+
+procedure-------- set of instructions that are coded for specific purpose
+it is kept in compiled form.
+they are the objects which do not return value by default
+
+
+function-----------
+theyre the objects used to do some processing and return the final output
+
+
+
+trigger---- theyre the set of object that execute when some events gets generated
+package----set of functions and procedures that are grouped together for specific purpose
+
+
+cursor-- objects that traverses through the data kept in the memory
+
+also creates anonymous block
+not retained physically.
+translated and executed.
+
+SET SERVEROUTPUT ON
+DECLARE
+	BEGIN
+		DBMS_OUTPUT.PUT_LINE('HELLO WELCOME TO PLSQL');
+	END;
+/
+
+PL/SQL procedure successfully completed.
+
+--
+DECLARING variables
+DECLARE
+A INT:=&X;
+B INT:=10;
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('ADDITION= '||(A+B));
+		
+END;
+/
+
+
+SYNTAX FOR DEFINING PROCEDURE
+
+CREATE PROCEDURE TR_13
+AS
+  BEGIN
+	DBMS_OUTPUT.PUT_LINE('HELLO');
+  END;
+/
+
+
+EXECUTE TR_13;
+OR
+EXCE PR_13;
+
+
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT)
+AS
+  BEGIN
+	DBMS_OUTPUT.PUT_LINE(A*B);
+  END;
+/
+
+EXECUTE PR_13(4,5);
+OR EXEC PR_13(4,5);
+
+
+SHOW ERROR
+OR
+SHOW ERR
+
+
+
+CREATE A PROCEDURE TO PERFORM ALL ARITHEMATIC OPERATIONS USING GIVEN PARAMETERS
+
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT)
+AS
+  BEGIN
+	DBMS_OUTPUT.PUT_LINE('MULTIPLICATION'||(A*B));
+	DBMS_OUTPUT.PUT_LINE('DIVISION'||(A/B));
+	DBMS_OUTPUT.PUT_LINE('ADDITION'||(A+B));
+	DBMS_OUTPUT.PUT_LINE('MINUS'||(A-B));
+  END;
+/
+
+
+-------
+
+
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT)
+AS
+  BEGIN
+IF(A>B) THEN
+DBMS_OUTPUT.PUT_LINE('A IS GREATER THAN B');
+ELSE
+DBMS_OUTPUT.PUT_LINE('B IS GREATER THAN A');
+END IF;	
+END;
+/
+
+
+
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT,C INT)
+AS
+  BEGIN
+	IF(A>B) THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS GREATER THAN '||B);
+	ELSIF A>C THEN
+	DBMS_OUTPUT.PUT_LINE('A IS GREATER THAN C');
+	ELSE
+	DBMS_OUTPUT.PUT_LINE('ELSE PART IS EXECUTED');
+	END IF;	
+END;
+/
+
+
+WRITE A PROCEDURE TO THE HIGHEST AND SMALLEST NO FROM THE 3 VALUES SUPLLIED.
+
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT,C INT)
+AS
+  BEGIN
+	IF(A>B) THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS GREATER THAN '||B);
+	ELSIF A>C THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS GREATEST ');
+	END IF;
+
+	IF B>A THEN
+	DBMS_OUTPUT.PUT_LINE(B||'GREATER THAN'||A);
+	ELSIF B>C THEN
+	DBMS_OUTPUT.PUT_LINE(B||' IS GREATEST');
+	END IF;
+
+	IF C>A THEN
+	DBMS_OUTPUT.PUT_LINE(C||' IS GREATEST');
+	END IF;	
+END;
+/
+
+==================
+CREATE OR REPLACE PROCEDURE TR_13 (A INT,B INT,C INT)
+AS
+  BEGIN
+	IF(A>B AND A>C) THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS GREATEST');
+	ELSIF (B>A AND B>C) THEN
+	DBMS_OUTPUT.PUT_LINE(B||' IS GREATEST');
+	ELSIF (C>A AND C>B) THEN
+	DBMS_OUTPUT.PUT_LINE(C||' IS GREATEST');
+	END IF;
+
+	IF(A<B AND A<C) THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS LEAST');
+	ELSIF (B<A AND B<C) THEN
+	DBMS_OUTPUT.PUT_LINE(B||' IS LEAST');
+	ELSIF (C<A AND C<B) THEN
+	DBMS_OUTPUT.PUT_LINE(C||' IS LEAST');
+	END IF;
+
+END;
+/
+
+EXEC TR_13(10,20,30);
+
+=====================
+
+DEFAULTS SHLD BE TO THE LEFT
+***
+=====
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE PR_13(A INT)
+AS
+  BEGIN
+	IF (A>10 OR A=99) THEN
+	DBMS_OUTPUT.PUT_LINE(A||' IS 2 DIGIT NO');
+ELSE
+DBMS_OUTPUT.PUT_LINE(A||' IS NOT 2 DIGIT');
+END IF;
+END;
+
+
+CREATE OR REPLACE PROCEDURE PR_13(A VARCHAR2)
+AS
+  BEGIN
+	IF (A='tech' OR A='TECH') THEN
+	DBMS_OUTPUT.PUT_LINE('LOGGED IN');
+ELSE
+DBMS_OUTPUT.PUT_LINE(' NOT LOGGED IN');
+END IF;
+END;
+/
+
+
+
+======
+
+CREATE OR REPLACE PROCEDURE PR_13(A INT, B INT DEFAULT 3,C INT DEFAULT 5)
+AS
+ANS INT;
+BEGIN
+ANS:=A+B+C;
+DBMS_OUTPUT.PUT_LINE(ANS||' : THIS IS OUTPUT');
+END;
+/
+
+EXEC PR_13(B=>3,A=>5,C=>56);
+
+
+=========
+
+CREATE OR REPLACE PROCEDURE PR_13(A INT)
+AS
+ENAM VARCHAR2(20);
+BEGIN
+SELECT ENAME INTO ENAM FROM EMP WHERE EMPNO=A;
+DBMS_OUTPUT.PUT_LINE('NAME='||ENAM||' OF EMPNO'||A);
+END;
+/
+
+EXEC PR_13(7900);
+
+
+===========
+
+
+
+SELECT TEXT FROM USER_SOURCE WHERE NAME='PR_13';
+
+SHOWS CODE
+
+
+
+
+
+
+
+
+
+***************************************************************************************************
+******************************************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************************************
+***************************************************************************************************
+
+
+
+loops
+
+loop statements are used when we want to get set of statements executed for several times
+
+fix iteration loop
+like 
+for loop--- basically used when we know the set of stats neede to be executed
+while loop and do while loop== they are used when number of times the set of statments sre not not know
+
+
+DECLARE
+  BEGIN 
+	FOR I IN 1..5
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(I);
+		END LOOP;
+END;
+/
+
+
+
+DECLARE
+  BEGIN 
+	FOR I IN 1..5
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(I|| CHR(9)||CHR(9)||'='||I*I);
+		END LOOP;
+END;
+/
+
+CHR 9 IS TAB
+
+DISPLAY THE TAB;E IN FOLLOWING FORMAT,AFTER ASKING HE USERTHE NUMBER
+E.G
+
+5 * 1 = 5
+
+TILL 5 * 10=50
+
+
+CREATE OR REPLACE PROCEDURE D2(A INT)
+AS
+ENAM VARCHAR2(20);
+BEGIN
+FOR I IN 1..10
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(5|| CHR(9)|| '*' || CHR(9)|| I || '='||5*I);
+		END LOOP;
+	
+END;
+/
+
+
+
+A INT:=&X;
+
+==============================
+DECLARE
+A INT :=&X;
+BEGIN
+
+FOR I IN 1..10
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(A || CHR(9)|| '*' || CHR(9)|| I || '='||(A*I));
+		END LOOP;
+	
+END;
+/
+
+==========
+
+DECLARE
+A INT :=&X;
+BEGIN
+
+FOR I IN REVERSE 1..10
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(A || CHR(9)|| '*' || CHR(9)|| I || '='||(A*I));
+		END LOOP;
+	
+END;
+/
+
+
+======
+DECLARE
+A INT :=1;
+BEGIN
+
+WHILE A<=5
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(A);
+	A:=A+1;
+		END LOOP;
+	
+END;
+/
+
+
+=====
+
+DECLARE
+A INT :=1;
+BEGIN
+
+
+		LOOP
+	DBMS_OUTPUT.PUT_LINE(A);
+	A:=A+1;
+	EXIT WHEN A>5;
+		END LOOP;
+	
+END;
+/
+
+===========
+
+
+CREATE OR REPLACE PROCEDURE ABC(ID IN EMP.EMPNO%TYPE)
+AS UNAME EMP.ENAME%TYPE;
+BEGIN
+SELECT ENAME INTO UNAME FROM EMP WHERE EMPNO=ID;
+DBMS_OUTPUT.PUT_LINE('THE VALUE YOU WANT: '|| UNAME);
+END;
+/
+
+
+==
+
+
+
+CREATE OR REPLACE PROCEDURE ABC(ID IN EMP.EMPNO%TYPE) AS
+EDATA EMP%ROWTYPE;
+BEGIN
+SELECT * INTO EDATA FROM EMP WHERE EMPNO=ID;
+DBMS_OUTPUT.PUT_LINE('ENAME' || EDATA.ENAME);
+DBMS_OUTPUT.PUT_LINE('SALARY' ||EDATA.SAL);
+DBMS_OUTPUT.PUT_LINE('JOB' || EDATA.JOB);
+END;
+/
+
+===============
+
+
+
+
+CREATE TABLE DUMMYTABLE AS SELECT * FROM EMP;
+
+
+
+
+
+QUESTION
+
+
+
+
+CREATE A DUMMY TABLE OF EMP.
+ACCEPT EMPNO AS PARAMETER OF PROCEDURE
+FETCH DATA AND CHECK IF HIS JOB IS CLERK OR SALESMAN THEN 
+INCREASE SALARY BY 5% ELSE INCRESE SALARY BY 7.5% AND STORE THE NEW DATA IN DUMMY TABLE.
+
+
+
+
+CREATE OR REPLACE PROCEDURE XYZ(EMPNO1 IN DUMMYTABLE.EMPNO%TYPE)
+AS
+EDATA DUMMYTABLE%ROWTYPE;
+BEGIN
+SELECT * INTO EDATA FROM EMP WHERE EMPNO=EMPNO1;
+
+
+IF (EDATA.JOB='CLERK' OR EDATA.JOB='SALESMAN' ) THEN
+
+UPDATE DUMMYTABLE
+SET SAL=EDATA.SAL*1.05
+WHERE EMPNO1=EMPNO;
+
+ELSE
+
+
+UPDATE DUMMYTABLE
+SET SAL=EDATA.SAL*1.075
+WHERE EMPNO1=EMPNO;
+
+END IF;
+
+
+END;
+/
+
+
+=========================
+
+CREATE OR REPLACE PROCEDURE XYZ(EMPNO1 IN DUMMYTABLE.EMPNO%TYPE)
+AS
+EDATA DUMMYTABLE%ROWTYPE;
+BEGIN
+SELECT * INTO EDATA FROM EMP WHERE EMPNO=EMPNO1;
+
+
+IF (EDATA.JOB='CLERK' OR EDATA.JOB='SALESMAN' ) THEN
+
+UPDATE DUMMYTABLE
+SET SAL=EDATA.SAL*1.05
+WHERE EMPNO1=EMPNO;
+
+ELSE
+
+
+UPDATE DUMMYTABLE
+SET SAL=EDATA.SAL*1.075
+WHERE EMPNO1=EMPNO;
+
+END IF;
+
+
+END;
+/
+
+=======================================
+
+
+
+DECLARE
+TYPE EMPREC IS RECORD(
+	ID INT,
+	ENAM EMP.ENAME%TYPE,
+	SALARY EMP.SAL%TYPE
+	);
+A1 EMPREC;
+
+ENO INT:=&I;
+
+BEGIN 
+	SELECT EMPNO,ENAME,SAL INTO A1 FROM EMP WHERE
+	EMPNO=ENO;
+	DBMS_OUTPUT.PUT_LINE(A1.ID||' '||A1.ENAM||' '||A1.SALARY);
+	
+END;
+/
+=======
+
+
+DISPLAY THE DETAILS OF HIGHEST EARNING EMPLOYEE
+
+
+DECLARE
+TYPE DATATYPE1 IS RECORD(
+	ID INT,
+	ENAM EMP.ENAME%TYPE,
+	JOBB EMP.JOB%TYPE,
+	MGRR EMP.MGR%TYPE,
+	HIREDATEE EMP.HIREDATE%TYPE,
+	SALARY EMP.SAL%TYPE,
+	COMMM EMP.COMM%TYPE,
+	DEPTNOO EMP.DEPTNO%TYPE
+	);
+
+A2 DATATYPE1;
+
+
+
+BEGIN 
+	
+	SELECT EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO INTO A2 FROM EMP WHERE SAL=(SELECT MAX(SAL) FROM EMP);
+	DBMS_OUTPUT.PUT_LINE(A2.ID||' '||A2.ENAM||' '||A2.JOBB||'  '||A2.MGRR||' ' ||A2.HIREDATEE||' '||A2.SALARY||' '||A2.COMMM||' '||A2.DEPTNOO);
+END;
+/
+
+=========
+
+
+DECLARE
+TYPE DATATYPE1 IS RECORD(
+	ROWNUM INT,
+	ID INT,
+	ENAM EMP.ENAME%TYPE,
+	JOBB EMP.JOB%TYPE,
+	MGRR EMP.MGR%TYPE,
+	HIREDATEE EMP.HIREDATE%TYPE,
+	SALARY EMP.SAL%TYPE,
+	COMMM EMP.COMM%TYPE,
+	DEPTNOO EMP.DEPTNO%TYPE
+	);
+
+A2 DATATYPE1;
+
+
+
+BEGIN 
+	
+	SELECT ROWNUM,EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO INTO A2 FROM EMP WHERE ROWNUM=1 ORDER BY JOB DESC;
+	DBMS_OUTPUT.PUT_LINE(A2.ID||' '||A2.ENAM||' '||A2.JOBB||'  '||A2.MGRR||' ' ||A2.HIREDATEE||' '||A2.SALARY||' '||A2.COMMM||' '||A2.DEPTNOO);
+END;
+/
+
+
+SELECT EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO INTO A2 FROM EMP WHERE ROWNUM=1 ORDER BY JOB DESC;
+SELECT EMPNO,MAX(SAL) FROM EMP WHERE (SELECT * INTO A2 FROM EMP) GROUP BY EMPNO;
+SELECT * INTO A2 FROM  EMP (SELECT * FROM A2 FROM EMP) WHERE ORDER BY JOB DESC
+SELECT * INTO A2 FROM EMP WHERE SAL=(SELECT MAX(SAL) FROM EMP);
+SELECT EMPNO,ENAME,JOB,MGR,HIREDATE,SAL,COMM,DEPTNO INTO A2 FROM EMP WHERE SAL=(SELECT MAX(SAL) FROM EMP);
+
+
+SELECT SAL FROM (SELECT ROWNUM R, SAL FROM (SELECT SAL FROM EMP ORDER BY SAL DESC)) WHERE R=2;
+SELECT SAL FROM (SELECT ROWNUM, SAL FROM EMP ORDER BY SAL DESC ) WHERE ROWNUM=1;
+SELECT ROWNUM, SAL FROM EMP WHERE ROWNUM=1 ORDER BY SAL DESC ;
+
+
+===================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DISPLAY THE DETAILS OF HIGHEST EARNING EMPLOYEE FROM BOTH TABLES
+
+
+
+
+DECLARE
+TYPE DATATYPE1 IS RECORD(
+	
+	ID INT,
+	ENAM EMP.ENAME%TYPE,
+	JOBB EMP.JOB%TYPE,
+	MGRR EMP.MGR%TYPE,
+	HIREDATEE EMP.HIREDATE%TYPE,
+	SALARY EMP.SAL%TYPE,
+	COMMM EMP.COMM%TYPE,
+	DEPTNOO EMP.DEPTNO%TYPE,
+	DEPTNOOO DEPT.DEPTNO%TYPE,
+	DNAMEE DEPT.DNAME%TYPE,
+	LOCC DEPT.LOC%TYPE
+	);
+
+A2 DATATYPE1;
+
+
+
+BEGIN 
+	
+	SELECT * INTO A2 FROM EMP A JOIN DEPT B ON A.DEPTNO=B.DEPTNO AND SAL=(SELECT MAX(SAL) FROM EMP );
+	DBMS_OUTPUT.PUT_LINE(A2.ID||' '||A2.ENAM||' '||A2.JOBB||'  '||A2.MGRR||' ' ||A2.HIREDATEE||' '||A2.SALARY||' '||A2.COMMM||' '||A2.DEPTNOO||' '||A2.DNAMEE||' '||A2.LOCC);
+END;
+/
+
+
+SELECT * INTO A2 FROM EMP A JOIN DEPT B ON A.DEPTNO=B.DEPTNO AND SAL=(SELECT MAX(SAL) FROM EMP );
+SELECT * INTO A2 FROM EMP A, DEPT B WHERE A.DEPTNO=B.DEPTNO AND SAL=(SELECT MAX(SAL) FROM EMP );
+
+
+==================================
+
+
+CREATE OR REPLACE PROCEDURE TR13(ID IN INT, ENAM OUT VARCHAR2)
+AS
+BEGIN
+	SELECT ENAME INTO ENAM FROM EMP WHERE EMPNO=ID;
+	END;
+/
+
+
+
+DECLARE 
+A VARCHAR2(20);
+BEGIN
+TR13(7900,A);
+DBMS_OUTPUT.PUT_LINE('ENAME= '||A);
+END;
+/
+
+
+
+===================
+
+NOT DONE
+DEFINE A PROCEDURE THAT WILL RETURN JOB AND SALARY OF THE GIVEN EMPLOYEE
+
+CREATE OR REPLACE PROCEDURE TR13(ID IN INT, ENAM OUT VARCHAR2,JOBB OUT VARCHAR2,SALL OUT INT)
+AS
+BEGIN
+	SELECT ENAME,JOB,SAL INTO ENAM,JOBB,SALL FROM EMP WHERE EMPNO=ID;
+	END;
+/
+
+
+
+DECLARE 
+A VARCHAR2(20);
+B INT;
+C INT;
+BEGIN
+
+TR13(7900,A,B);
+DBMS_OUTPUT.PUT_LINE('ENAME= '|| ID ||' JOB ='|| JOBB || 'SAL ='||SALL);
+END;
+/
+
+
+=====================
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE FORMATPHONE
+(PPHONE IN OUT VARCHAR2)
+AS
+BEGIN
+PPHONE := '(' || SUBSTR(PPHONE,1,3) || ')' || SUBSTR(PPHONE,4,3) || '-' || SUBSTR(PPHONE,7);
+
+
+
+END;
+/
+
+
+
+VARIABLE GPHONE VARCHAR2(25)
+
+DECLARE
+BEGIN
+:GPHONE := '07922818667';
+END;
+
+
+EXEC FORMATPHONE (:GPHONE)
+PRINT :GPHONE
+
+
+===============
+
+
+
+SELECT SAL,CASE SAL WHEN 800 THEN SAL+100
+WHEN 1000 THEN SAL+200
+ELSE SAL+300 END AS DATA FROM EMP;
+
+
+
+
+SELECT SAL,CASE WHEN JOB='CLERK' THEN SAL+(SAL*0.5)
+WHEN JOB='SALESMAN' THEN SAL+(SAL*0.7)
+END "BONUS" FROM EMP;
+
+
+
+SELECT SAL,CASE 
+WHEN SAL>1000 THEN SAL*.50 
+WHEN SAL>800 THEN SAL*.20y
+END DATA FROM EMP;
+
+
+==================================================================================
+
+
+CURSOR
+
+
+==================================================================================
+
+
+%FOUND --- WANT TO CHECK WHETHER DATA IS FOUND AFTER FIRING THE QUERY,
+WHEN THE CURSOR TRANVERSES WHETTHER IT FINDS THE DATA IN CONTEXT DATA.
+
+%NOTFOUND--- OPPOSITE OF FOUND
+
+
+
+
+CREATE OR REPLACE PROCEDURE TR_14(ID INT)
+AS 
+BEGIN 
+	UPDATE EMP SET SAL=SAL+100 WHERE EMPNO=ID;
+	DBMS_OUTPUT.PUT_LINE('NO OF ROWS UPDATED = '||SQL%ROWCOUNT);
+END;
+
+
+
+CREATE OR REPLACE PROCEDURE TR_14(JD VARCHAR2)
+AS 
+BEGIN 
+	UPDATE EMP SET SAL=SAL+100 WHERE JOB=JD;
+	DBMS_OUTPUT.PUT_LINE('NO OF ROWS UPDATED = '||SQL%ROWCOUNT);
+END;
+/
+
+
+
+
+
+
+
+================================
+
+
+
+
+
+EXPLICIT CURSOR
+
+
+
+
+CREATE OR REPLACE PROCEDURE TR_14(JD VARCHAR2)
+AS 
+CURSOR CR_EMP IS SELECT EMPNO,ENAME,SAL FROM EMP WHERE JOB=JD;
+
+INFO CR_EMP%ROWTYPE;
+
+BEGIN
+	OPEN CR_EMP;
+		LOOP
+			FETCH CR_EMP INTO INFO;
+			EXIT WHEN CR_EMP%NOTFOUND;
+
+			DBMS_OUTPUT.PUT_LINE(INFO.EMPNO||' ' ||INFO.ENAME|| ' ' ||INFO.SAL);
+			
+		END LOOP;
+	CLOSE CR_EMP;
+
+END;
+/
+
+
+
+===========
+
+
+WRITE A PROCEDURE TO DISPLAY THE EMPLOYEES WORKING FOR DEPARTMENT NO 20 IN FOLLOWING FORMAT
+
+DEPTNO:
+DNAME:
+LOCATION:
+==========================================
+SR.NO	ENAME	SAL	JOB	COMM
+==========================================
+1	XYZ	800	CLERK	300
+2	pqr	950	PRESIDENT	500
+
+
+CREATE OR REPLACE PROCEDURE TR_15
+AS 
+CURSOR CR_EMP IS SELECT ROWNUM,A.ENAME,A.SAL,A.JOB,A.COMM,B.DNAME,B.DEPTNO,B.LOC FROM EMP A JOIN DEPT B ON A.DEPTNO=B.DEPTNO
+WHERE B.DEPTNO=20;
+
+INFO CR_EMP%ROWTYPE;
+BEGIN
+OPEN CR_EMP;
+FETCH CR_EMP INTO INFO;
+
+		DBMS_OUTPUT.PUT_LINE('DEPTNO:'||INFO.DEPTNO);
+		DBMS_OUTPUT.PUT_LINE('DNAME:'||INFO.DNAME);
+		DBMS_OUTPUT.PUT_LINE('LOCATION:'||INFO.LOC);
+
+	DBMS_OUTPUT.PUT_LINE('================================');
+	DBMS_OUTPUT.PUT_LINE('SR.NO'|| CHR(9)|| 'ENAME' || CHR(9) ||'SAL'||CHR(9)||'COMM');
+	DBMS_OUTPUT.PUT_LINE('================================');
+
+	
+
+		LOOP
+			DBMS_OUTPUT.PUT_LINE(INFO.ROWNUM||CHR(9)  ||INFO.ENAME|| CHR(9)  ||INFO.SAL|| CHR(9)||INFO.COMM);
+			FETCH CR_EMP INTO INFO;
+			EXIT WHEN CR_EMP%NOTFOUND;
+			
+			
+			
+		END LOOP;
+	CLOSE CR_EMP;
+
+END;
+/
+
+
+
+=============================
+
+
+WRITE A PROCEDURE TO SELECT ONLY THOSE DATA FROM EMPLOYEES WHO ARE EARNING MORE 1000 AND ARE EITHER MANAGER OR CLERK AND STORE IT IN A SEPARATE TABLE AFTER INCREMENTING THEIR SALARY
+CLERK 15%
+MANAGER 20%
+
+CREATE OR REPLACE PROCEDURE TR16
+AS
+CURSOR CR_DOM IS SELECT * FROM EMP WHERE SAL>1000 AND (JOB='MANAGER' OR JOB='CLERK');
+
+INFO CR_DOM%ROWTYPE;
+
+BEGIN
+	OPEN CR_DOM;
+	
+
+	LOOP 
+	FETCH CR_DOM INTO INFO;
+	EXIT WHEN CR_DOM%NOTFOUND;
+	IF (INFO.JOB='CLERK') THEN
+	
+	INSERT INTO DUMMY1234 VALUES(INFO.EMPNO,INFO.ENAME,INFO.JOB,INFO.MGR,INFO.HIREDATE,INFO.SAL*1.15,INFO.COMM,INFO.DEPTNO);
+
+	ELSIF (INFO.JOB='MANAGER') THEN
+	
+	
+	INSERT INTO DUMMY1234 VALUES(INFO.EMPNO,INFO.ENAME,INFO.JOB,INFO.MGR,INFO.HIREDATE,INFO.SAL*1.20,INFO.COMM,INFO.DEPTNO);
+
+
+	END IF;
+	END LOOP;
+	
+	CLOSE CR_DOM;
+
+END;
+/
+
+CREATE TABLE  DUMMY1234(EMPNO INT,ENAME VARCHAR2(20),JOB VARCHAR2(20),MGR INT,HIREDATE DATE, SAL INT,COMM INT,DEPTNO INT);
+
+
+
+***************************************************************************************************
+******************************************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************************************
+***************************************************************************************************
+
+
+
+
+CREATE OR REPLACE PROCEDURE XYZ AS
+	CURSOR C_EMP (CIN_NO NUMBER,JOB VARCHAR2) IS
+
+	SELECT ENAME, MGR FROM EMP WHERE EMPNO = CIN_NO;
+
+	V_DEPTNO EMP.EMPNO%TYPE:=7876;
+	J EMP.JOB%TYPE:='CLERK';
+	
+	ENAMEE VARCHAR2(20);
+	MGRR NUMBER;
+
+
+BEGIN
+
+
+OPEN C_EMP (V_DEPTNO,J);
+FETCH C_EMP INTO ENAMEE,MGRR;
+
+DBMS_OUTPUT.PUT_LINE(ENAMEE);
+DBMS_OUTPUT.PUT_LINE(MGRR);
+
+
+
+CLOSE C_EMP;
+
+END;
+/
+
+================================================================
+
+
+1.CREATE PROCEDURE
+2.CURSOR THAT WILL FETCH DATA FROM DEPT TABLE
+3.DEFINE A PARAMETERISED CURSOR THAT WILL FETCH DATA DEPARTMENT WISE AND DISPLAY THE SAME
+
+
+
+CREATE OR REPLACE PROCEDURE XY AS 
+
+	CURSOR C_GEN IS SELECT * FROM DEPT;
+
+	CURSOR C_DEPT (DNN NUMBER) IS SELECT * FROM EMP WHERE DEPTNO=DNN;
+	
+	INFO1 C_GEN%ROWTYPE;
+	INFO2 C_DEPT%ROWTYPE;
+	
+SAL EMP.SAL%TYPE;
+BEGIN
+
+OPEN C_GEN;
+
+	
+		LOOP
+
+FETCH C_GEN INTO INFO1;
+		
+			OPEN C_DEPT(INFO1.DEPTNO);
+		
+				LOOP
+				
+				DBMS_OUTPUT.PUT_LINE(INFO2.EMPNO||CHR(9)||INFO2.ENAME||CHR(9)||INFO2.DEPTNO||CHR(9)||INFO1.LOC||CHR(9)||INFO1.DNAME);
+
+			FETCH C_DEPT INTO INFO2;
+
+			EXIT WHEN C_DEPT%NOTFOUND;
+
+
+				END LOOP;
+			CLOSE C_DEPT;
+
+
+EXIT WHEN C_GEN%NOTFOUND;
+
+		END LOOP;
+
+CLOSE C_GEN;
+
+		END;
+/
+
+
+
+
+
+============================================================================================================================
+diff right
+EXAMPLE:
+1. CREATE A PROCEDURE
+2.CREATE RECORD TYPE THAT WILL HOLD DETAILS LIKE EMPNO,ENAME,SAL,JOB,DNAME AND LOC
+3.DEFINE A SINGLE CURSOR THAT WILL FETCH DETAILS AND FROM DEPT TABLE
+4.USE THE DATA FETCHED BY SIMPLE CURSOR TO REF CURSOR TO GET DATA OF EMPLOYEES WORKING FOR SPECIFIC DEPARTMENT AND HAVING DESIGNATION AS CLERK.
+
+
+
+
+
+DECLARE
+	TYPE REFT1 IS REF CURSOR RETURN EMP%ROWTYPE;
+	EDATA REFT1;
+	DATAHOLD EMP%ROWTYPE;
+
+BEGIN 
+OPEN EDATA FOR SELECT * FROM EMP;
+
+	LOOP
+		FETCH EDATA INTO DATAHOLD;
+		EXIT WHEN EDATA%NOTFOUND;
+		DBMS_OUTPUT.PUT_LINE(DATAHOLD.EMPNO || ' ' || DATAHOLD.ENAME || ' ' || DATAHOLD.SAL);
+	END LOOP;
+	CLOSE EDATA;
+END;
+/
+
+========================================================================================================
+1. CREATE A PROCEDURE
+2.CREATE RECORD TYPE THAT WILL HOLD DETAILS LIKE EMPNO,ENAME,SAL,JOB,DNAME AND LOC
+3.DEFINE A SINGLE CURSOR THAT WILL FETCH DETAILS AND FROM DEPT TABLE
+4.USE THE DATA FETCHED BY SIMPLE CURSOR TO REF CURSOR TO GET DATA OF EMPLOYEES WORKING FOR SPECIFIC DEPARTMENT AND HAVING DESIGNATION AS CLERK.
+
+
+
+CREATE OR REPLACE PROCEDURE PS AS 
+
+	CURSOR C_GEN IS SELECT * FROM DEPT;
+	INFO1 C_GEN%ROWTYPE;
+
+
+	TYPE REFT1  (DNN NUMBER, JOB VARCHAR2) IS REF CURSOR RETURN EMP%ROWTYPE;
+	EDATA REFT1;
+	DATAHOLD EMP%ROWTYPE;
+
+	TYPE EMPREC IS RECORD (NAME VARCHAR 2(20),EMPNO INT, SALARY INT);
+	TYPE REFC IS REF CURSOR RETURN EMPREC;
+
+
+
+	
+	
+	
+	
+	
+	DEPT EMP.EMPNO%TYPE:=&X;
+
+===========
+CORRECT
+
+BEGIN 
+OPEN C_GEN; 
+FETCH C_GEN INTO INFO1;
+OPEN EDATA (INFO1.DEPT);
+
+
+OPEN EDATA FOR SELECT * FROM EMP WHERE DEPTNO=DEPT AND JOB='CLERK';
+	LOOP
+		FETCH EDATA INTO DATAHOLD;
+		EXIT WHEN EDATA%NOTFOUND;
+		DBMS_OUTPUT.PUT_LINE(DATAHOLD.EMPNO || ' ' || DATAHOLD.ENAME || ' ' || DATAHOLD.SAL);
+	END LOOP;
+	CLOSE EDATA;
+END;
+/
+
+
+=========================
+
+TO DO::
+
+
+CREATE PROCEDURE SAW AS
+
+CURSOR CUR IS SELECT * FROM DEPT;
+
+TYPE REFT IS REF REF CURSOR RETURN EDATA;
+EDATA 
+DATAHOLD
+
+
+
+
+
+
+
+
+===========================================================================================
+
+
+EXCEPTIONS
+
+
+SYSTEM: NAME AS WELL AS ERROR CODE
+UNNAMED SYSTEM
+USER DEFINED
+
+
+DECLARE
+BEGIN
+DBMS_OUTPUT.PUT_LINE(6/0);
+
+EXCEPTION
+WHEN ZERO_DIVIDE THEN
+DBMS_OUTPUT.PUT_LINE(SQLCODE || ' ' || SQLERRM);
+END;
+
+CREATE OR REPLACE PROCEDURE NAAM(A INT) 
+AS 
+NAME VARCHAR2(20);
+BEGIN 
+	SELECT ENAME INTO NAME FROM EMP WHERE EMPNO=A;
+	DBMS_OUTPUT.PUT_LINE('NAME= '||NAME);
+	
+	EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('RECORD NOT FOUND');
+
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE('MORE THAN ONE ROW IS FOUND');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('SOME OTHER ERRORS OCCURRED');
+END;
+
+
+
+===================
+
+
+
+USER DEFINED
+
+1.DECLARE A VARIABLE OF EXCEPTION TYPE AND WE CAN GENERATE AN EXCEPTION BASED ON THE VIOLATION OF BUSINESS RIHGTS
+RAISE---AN EXCEPTION
+
+
+
+DECLARE 
+
+INVALID_AGE EXCEPTION;
+VID INT;
+
+BEGIN
+VID :=&UID;
+IF (VID<18) THEN
+RAISE INVALID_AGE;
+ELSE 
+DBMS_OUTPUT.PUT_LINE('AGE ENTERED IS ='||VID);
+END IF;
+
+EXCEPTION WHEN INVALID_AGE THEN
+DBMS_OUTPUT.PUT_LINE('AGE SHLD BE GREATER THEN 18');
+END;
+/
+
+==========================================
+
+day 3 assignment
+Exceptions
+
+Practice 1
+
+?	Create a table named MESSAGES (err_message VARCHAR2(250))
+?	Write a PL/SQL block that accepts a salary value from a user and displays name of the employee having the salary value, on the screen. 
+?	 If the salary entered returns more than one row, handle the exception with an appropriate Exception handler and insert into the MESSAGES table the message
+ ? More than one employee with salary of <input salary>?
+?	 If the salary entered does not return any  rows, handle the exception with an appropriate Exception handler and insert into the MESSAGES table the message
+ ? No employee with salary of < input salary>?
+?	 If the salary entered returns only one row, insert into the MESSAGES table the employees name 
+?	 Handle any other exception with an appropriate Exception handler and insert into the MESSAGES table the message ? Some other error occurred?
+
+
+
+ CREATE TABLE MESSAGES (err_message VARCHAR2(250));
+
+
+DECLARE
+
+S INT;
+NAME VARCHAR2(20);
+COIN INT;
+MORE_ROWS EXCEPTION;
+NO_EMP EXCEPTION;
+
+BEGIN
+S:=&S;
+
+
+SELECT ENAME INTO NAME FROM EMP WHERE S=SAL;
+SELECT COUNT(ROWNUM) INTO COIN FROM EMP WHERE S=SAL;
+IF COIN>1 THEN 
+RAISE MORE_ROWS;
+INSERT INTO MESSAGES VALUES('NAME IS '||NAME);
+
+ELSIF COIN=1 THEN
+DBMS_OUTPUT.PUT_LINE('ROWNUM IS ONE');
+INSERT INTO MESSAGES VALUES('EMPLOYEE NAME TO BE ENTERED'||NAME);
+
+ELSE
+RAISE NO_EMP;
+INSERT INTO MESSAGES VALUES('No employee with salary of '|| S);
+END IF;
+			EXCEPTION 
+
+			WHEN MORE_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE(' More than one employee with salary of '||S);
+			WHEN NO_EMP THEN
+		DBMS_OUTPUT.PUT_LINE('No employee with salary of '|| S);
+			WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('SOME OTHER ERRORS OCCURRED');
+
+END;
+/
+
+=============================================================================
+
+
+day 3
+Practice 4
+?	Write a PL/SQL block that accepts the employee_id of two employees as two user inputs empno1 and empno2. If empno1 exists in the ?employees? table, then the block increases the salary of the employee by 10%. If empno2 exists in the ?employees? table then the block increases his salary by 20%. The block should raise and handle the errors if empno1 or empno2 or both do not exist, by displaying the appropriate messages. Note that if empno1 does not exist but empno2 exists then the salary of empno2 must be increased. Also when both empno1 and empno2 do not exist then the error must be handled by the block.
+ 
+CREATE OR REPLACE PROCEDURE EEE (EMPNO1 INT,EMPNO2 INT)
+AS
+
+ONE INT;
+TWO INT;
+
+BEGIN
+
+SELECT COUNT(EMPNO) INTO ONE FROM EMP WHERE EMPNO=EMPNO1;
+SELECT COUNT(EMPNO) INTO TWO FROM EMP WHERE EMPNO=EMPNO2;
+
+IF ((ONE=1) AND (TWO=1)) THEN
+
+UPDATE DUMM
+SET SAL=SAL*1.10
+WHERE EMPNO=EMPNO1;
+
+UPDATE DUMM
+SET SAL=SAL*1.20
+WHERE EMPNO=EMPNO2;
+
+END IF;
+
+
+IF (ONE=1) AND (TWO!=1) THEN
+
+UPDATE DUMM
+SET SAL=SAL*1.10
+WHERE EMPNO=EMPNO1;
+
+END IF;
+
+IF  (ONE!=1) AND (TWO=1) THEN
+
+UPDATE DUMM
+SET SAL=SAL*1.20
+WHERE EMPNO=EMPNO2;
+
+
+END IF;
+
+
+IF (ONE!=1) AND (TWO!=1) THEN
+
+DBMS_OUTPUT.PUT_LINE('BOTH NOT EQUAL');
+
+END IF;
+
+
+END;
+/
+
+
+EXEC EEE(7876,7788);
+SELECT * FROM DUMM;
+
+
+===============================================================================
+
+
+uma's code
+
+
+
+CREATE OR REPLACE PROCEDURE SAW
+AS
+
+TYPE EMPDA IS RECORD(ENAM VARCHAR2(20),ENO NUMBER,DNO NUMBER,DNAM VARCHAR2(20));
+
+TYPE REFT2 IS REF CURSOR RETURN EMPDA;
+EDATA REFT2;
+DATAHOLD EDATA%ROWTYPE;
+
+
+
+
+CURSOR CR IS SELECT DEPTNO FROM DEPT;
+DEP DEPT.DEPTNO%TYPE;
+
+
+BEGIN
+OPEN CR;
+LOOP
+FETCH CR INTO DEP;
+EXIT WHEN CR%NOTFOUND;
+OPEN EDATA FOR SELECT ENAME,EMPNO,E.DEPTNO,DNAME FROM EMP E JOIN DEPT D ON D.DEPTNO=E.DEPTNO WHERE JOB='CLERK' AND D.DEPTNO=DEP;
+
+LOOP
+FETCH EDATA INTO DATAHOLD;
+EXIT WHEN EDATA%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(DATAHOLD.ENAM ||' ' ||DATAHOLD.ENO||' '||DATAHOLD.DNO||' '||DATAHOLD.DNAM);
+END LOOP;
+CLOSE EDATA;
+
+END LOOP;
+CLOSE CR; 
+
+END;
+/
+
+
+
+
+
+***************************************************************************************************
+******************************************************************************************************************************************************************************************************
+******************************************************************************************************************************************************************************************************
+***************************************************************************************************
+
+DAY 4
+
+
+
+functions are objects that always return value
+
+CREATE OR REPLACE FUNCTION FUNC_EX (A INT) RETURN INT
+AS
+BEGIN
+DBMS_OUTPUT.PUT_LINE('MY FIRST FUNC');
+RETURN A*A;
+END;
+/
+
+
+
+
+
+
+
+DECLARE
+ANS INT;
+BEGIN
+ANS:=FUNC_EX(9);
+DBMS_OUTPUT.PUT_LINE(ANS);
+END;
+/
+
+
+
+OR 
+
+
+DECLARE
+ANS INT;
+BEGIN
+DBMS_OUTPUT.PUT_LINE(FUNC_EX(9));
+END;
+/
+
+
+OR 
+
+
+EXEC DBMS_OUTPUT.PUT_LINE(FUNC_EX(9));
+
+
+****************************************************
+
+CREATE OR REPLACE FUNCTION FUNC_EX (A INT) 
+RETURN VARCHAR2
+AS
+NAME VARCHAR2(20);
+BEGIN
+SELECT ENAME INTO NAME FROM EMP WHERE EMPNO=A;
+RETURN NAME;
+END;
+/
+
+
+DBMS_OUTPUT.PUT_LINE('MY FIRST FUNC');
+
+
+DECLARE
+BEGIN
+DBMS_OUTPUT.PUT_LINE(FUNC_EX(7876));
+END;
+/
+
+**********************************************
+
+
+CREATE OR REPLACE FUNCTION TAX (PVAL IN NUMBER)
+RETURN NUMBER
+AS
+BEGIN
+RETURN (PVAL * 0.05);
+END TAX;
+/
+
+
+
+EXEC DBMS_OUTPUT.PUT_LINE(TAX(7876));
+
+
+
+SELECT EMPNO,ENAME,SAL,TAX(SAL) FROM EMP ORDER BY TAX(SAL);
+
+
+
+
+
+SELECT EMPNO,ENAME,JOB,SAL,TAX(SAL) FROM EMP WHERE TAX(SAL)=250;
+
+
+INSERT INTO EMP(EMPNO,ENAME,MGR,DEPTNO,SAL) VALUES(4545,'JACK',7900,10,TAX(90000));
+
+
+**************************************************************************************************
+
+
+CREATE OR REPLACE FUNCTION FUNC_EX (A INT) 
+RETURN VARCHAR2
+AS
+NAME VARCHAR2(20);
+BEGIN
+SELECT ENAME INTO NAME FROM EMP WHERE EMPNO=A;
+RETURN NAME;
+
+	EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+	DBMS_OUTPUT.PUT_LINE('PLS ENTER CORECT VALUE');
+	RETURN -1; OR RETURN 'NO;'
+
+END;
+/
+
+
+
+DECLARE
+BEGIN
+DBMS_OUTPUT.PUT_LINE(FUNC_EX(787454));
+END;
+/
+
+
+**************************************************************
+
+
+DAY 4
+Practice 2
+
+?	Create a function named USER_ANNUAL_COMP that has three parameters p_eno, p_sal and p_comm for passing on the values of an employee_id, the current salary and commission of the employee respectively. The function calculates and returns the annual compensation of the employee by using the following formula.
+     annual_compensation =  (p_sal+p_comm)*12
+      If the salary or commission value is NULL then zero should be substituted for it. 
+?	Give a call to USER_ANNUAL_COMP from a SELECT statement, against the EMPLOYEES table.
+
+
+
+
+CREATE OR REPLACE FUNCTION USER_ANNUAL_COMP(P_ENO INT, P_SAL INT, P_COMM INT)
+RETURN INT
+AS
+ANNUAL_COMPENSATION INT;
+BEGIN
+ANNUAL_COMPENSATION:=(P_SAL+P_COMM)*12;
+RETURN ANNUAL_COMPENSATION;
+END;
+/
+
+
+SELECT EMPNO,SAL,COMM,USER_ANNUAL_COMP(EMPNO,NVL(SAL,0),NVL(COMM,0)) ANNUAL_SAL FROM EMP ;
+
+
+********************************************
+
+CREATE OR REPLACE FUNCTION CK_DATA(A INT)
+RETURN BOOLEAN
+AS
+CNT INT;
+
+BEGIN
+SELECT COUNT(EMPNO) INTO CNT FROM EMP WHERE EMPNO=A;
+IF CNT>0 THEN
+RETURN TRUE;
+ELSE
+RETURN FALSE;
+END IF;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+RETURN FALSE;
+WHEN OTHERS THEN
+RETURN FALSE;
+END;
+/
+
+
+SELECT EMPNO,CK_DATA(EMPNO)  FROM EMP ;
+
+
+
+*****
+SELECT EMPNO,CK_DATA(EMPNO)  FROM EMP ;
+CANNOT DO THIS QUERY  
+BOOLEAN NOT ACCEPTED IN SELECT QUERY
+*****
+
+
+
+DECLARE
+ANS BOOLEAN;
+BEGIN
+ANS:=CK_DATA(4541);
+
+IF ANS=TRUE THEN
+	DBMS_OUTPUT.PUT_LINE('RECORD EXISTS');
+ELSE
+	DBMS_OUTPUT.PUT_LINE('RECORD DOESNT EXISTS');
+END IF;
+END;
+/
+
+***************************************************************************************************
+
+DAY 4
+Practice 3
+
+?	Create a function named USER_VALID_DEPTNO that has a single parameter p_dno to accept a department number and returns a BOOLEAN value. The function returns TRUE if the department number exists in the DEPARTMENTS table else it returns FALSE.
+?	Create a procedure named SHOW_STRENGTH that accepts department number in a single parameter p_deptno from user. The procedure gives a call to USER_VALID_DEPTNO. If the function returns TRUE then the procedure finds out how many employees are there in the department from the EMPLOYEES table and displays the same on the screen. If the function returns FALSE then the procedure displays an appropriate error message.
+?	Give call to SHOW_STRENGTH by passing on department number 10. Do the same for department number 76
+
+
+
+CREATE OR REPLACE FUNCTION USER_VALID_DEPTNO(P_DNO INT)
+RETURN BOOLEAN
+AS
+ID INT;
+CNT INT;
+BEGIN
+
+SELECT DEPTNO INTO ID FROM DEPT WHERE DEPTNO=P_DNO;
+IF ID=P_DNO THEN
+RETURN TRUE;
+ELSE
+
+RETURN FALSE;
+END IF;
+
+EXCEPTION
+
+WHEN NO_DATA_FOUND THEN
+RETURN FALSE;
+WHEN OTHERS THEN
+RETURN FALSE;
+
+
+
+END;
+/
+
+
+
+
+CREATE OR REPLACE PROCEDURE SHOW_STRENGTH(P_DEPTNO INT)
+AS
+CNT INT;
+ANS BOOLEAN;
+BEGIN
+
+ANS:=USER_VALID_DEPTNO(P_DEPTNO);
+IF ANS=TRUE THEN
+
+SELECT COUNT(EMPNO) INTO CNT FROM EMP WHERE DEPTNO=P_DEPTNO;
+DBMS_OUTPUT.PUT_LINE('THE TOTAL COUNT OF EMP IS '||CNT);
+ELSIF ANS=FALSE THEN
+DBMS_OUTPUT.PUT_LINE('NOT A CORRECT NO. OR  EMPLOYEE NUMBER');
+END IF;
+END;
+/
+
+
+
+
+***********************************************************************************************************
+
+DAY 4
+
+Practice 1
+
+?	Create a procedure called USER_QUERY_EMP that accepts three parameters. Parameter p_myeno is of IN parameter mode which provides the employee_id value. The other two parameters p_myjob and p_mysal are of OUT mode. The procedure retrieves the salary and job_id of an employee with the provided employee_id and assigns those to the two OUT parameters respectively. The procedure should handle the error if the employee_id does not exist in the EMPLOYEES table by displaying an appropriate message. Use bind variables for the two OUT Parameters.
+?	Compile the code, invoke the procedure, and display the salary and job title for employee number 200. Do the same for employee number 120.
+
+
+CREATE OR REPLACE PROCEDURE USER_QUERY_EMP(P_ENO IN NUMBER, P_MYJOB OUT VARCHAR2,P_MYSAL OUT NUMBER)
+AS
+
+
+BEGIN
+SELECT JOB INTO P_MYJOB FROM EMP WHERE EMPNO=P_ENO;
+SELECT SAL INTO P_MYSAL FROM EMP WHERE EMPNO=P_ENO;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+DBMS_OUTPUT.PUT_LINE('NO DATA FOUND');
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE('OTHERS,ENTER CORRECT VALUE');
+
+
+END;
+/
+
+
+
+VARIABLE JB VARCHAR2(20);
+VARIABLE SL NUMBER;
+DECLARE
+
+ID INT:=&X;
+BEGIN
+USER_QUERY_EMP(ID,:JB,:SL);
+
+END;
+/
+
+
+PRINT :JB
+PRINT :SL
+**************************************************************************************************************
+
+
+DAY4
+Practice 4
+
+?	Create a procedure named SHOW_RECORDS that accepts a single parameter p_join_date. The procedure determines and displays on the screen, the details of the employees who have joined after p_join_date, in the following format. 
+Employees Joined after ddth, Month yyyy
+
+EMPLOYEE FIRST NAME		JOB		SALARY	DEPARTMENT 
+_____________________________________________________________
+
+XXXXXXXX			XXXXX		99,999		  99
+XXXXXXXX			XXXXX		99,999		  99
+
+
+
+The procedure should display appropriate message if there is no employee who joined after p_join_date .
+?	Give a call to SHOW_RECORDS from an anonymous PL/SQL block 
+
+
+
+select * from emp where (1981<extract(year from hiredate)) ;
+
+
+select * from emp where (1981<extract(year from hiredate)) or (1981=(extract(year from hiredate))  and 3<extract(month from hiredate)  ) ;
+
+select * from emp where (1981<extract(year from hiredate)) 
+
+or (1981=(extract(year from hiredate))  and 3<extract(month from hiredate)  )
+
+
+or (1981=(extract(year from hiredate))  and 3=extract(month from hiredate)  and 12<extract(day from hiredate) ) ;
+**************************************************************************************************************                          
+SELECT TO_CHAR(TO_DATE(SYSDATE,'DD-MON-YY'),'DDTH, Month YYYY') FROM DUAL;
+
+**************************************************************************************************************
+
+DAY 4
+
+Practice 4
+
+?	Create a procedure named SHOW_RECORDS that accepts a single parameter p_join_date. The procedure determines and displays on the screen, the details of the employees who have joined after p_join_date, in the following format. 
+Employees Joined after ddth, Month yyyy
+
+EMPLOYEE FIRST NAME		JOB		SALARY	DEPARTMENT 
+_____________________________________________________________
+
+XXXXXXXX			XXXXX		99,999		  99
+XXXXXXXX			XXXXX		99,999		  99
+
+
+
+The procedure should display appropriate message if there is no employee who joined after p_join_date .
+?	Give a call to SHOW_RECORDS from an anonymous PL/SQL block 
+
+
+
+
+CREATE OR REPLACE PROCEDURE SHOW_RECORDS
+AS
+
+
+
+BEGIN
+SELECT
+
+
+END;
+
+
+
+
+
+
+DECLARE
+P_JOIN VARCHAR2(8):=&JOINING;
+YEAR NUMBER;
+MONTH NUMBER;
+DAY NUMBER;
+
+
+
+
+
+SELECT TO_CHAR(TO_DATE(SYSDATE,'DD-MON-YY'),'DDTH, Month YYYY') FROM DUAL;
+
+
+
+
+
+
+**************************************************************************************************************
+
+
+CREATE OR REPLACE PROCEDURE QWE(YEAR NUMBER,MONTH NUMBER,DAY NUMBER)
+AS
+CURSOR K1 IS (select * from emp where (YEAR<extract(year from hiredate)) or 
+(YEAR=(extract(year from hiredate))  and MONTH<extract(month from hiredate)  )
+or (YEAR=(extract(year from hiredate))  and MONTH=extract(month from hiredate)  and DAY<extract(day from hiredate) ));
+
+AB EXCEPTION;
+INFO EMP%ROWTYPE;
+INFO1 EMP%ROWTYPE;
+INFO2 NUMBER;
+
+BEGIN
+
+SELECT * INTO INFO2 FROM (SELECT EXTRACT( YEAR FROM (SELECT MAX(HIREDATE) FROM EMP)) FROM DUAL);
+
+IF INFO2 < YEAR THEN
+ RAISE AB;
+END IF;
+
+OPEN K1;
+
+	LOOP
+	DBMS_OUTPUT.PUT_LINE('CHK1');
+	FETCH K1 INTO INFO;
+	EXIT WHEN K1%NOTFOUND;	
+
+	DBMS_OUTPUT.PUT_LINE(INFO.ENAME||CHR(9)||INFO.EMPNO||CHR(9)||INFO.SAL||CHR(9)||INFO.HIREDATE);
+	END LOOP;
+	CLOSE K1;
+	EXCEPTION
+	WHEN AB THEN DBMS_OUTPUT.PUT_LINE('NOTHING');
+
+END;
+/
+
+SELECT EXTRACT
+select * INTO INFO1 from emp where (YEAR<extract(year from hiredate)) or (YEAR=(extract(year from hiredate))  and MONTH<extract(month from hiredate)  )
+or (YEAR=(extract(year from hiredate))  and MONTH=extract(month from hiredate)  and DAY<extract(day from hiredate) );
+
+
+SELECT * FROM SELECT * FROM EMP WHERE EXTRACT(YEAR FROM MAX(HIREDATE))<1984;
+ INTO INFO2
+
+
+
+SELECT MAX(HIREDATE) FROM EMP;
+SELECT EXTRACT( YEAR FROM (SELECT MAX(HIREDATE) FROM EMP)) FROM DUAL;
+
+
+
+*****************************************************************************
+
+SELECT MAX(HIREDATE) FROM EMP;
+(SELECT EXTRACT(YEAR FROM (SELECT MAX(HIREDATE) FROM EMP))) >YEAR 
+SELECT * FROM EMP WHERE (SELECT EXTRACT(YEAR FROM (SELECT MAX(HIREDATE) FROM EMP))) > 1981;
+
+
+SELECT EXTRACT(YEAR FROM (SELECT MAX(HIREDATE))) FROM EMP;
+
+
+*********************************************************************************
+
+DAY 4
+Practice 6
+
+
+Create a stored procedure Gen_Bill which will take custid, Bill_amt and Bill_date as argument to insert a record in the Bill_Details table on the basis of the following rules:
+a)	A unique Bill_id should be generated and inserted into table
+b)	Check referential integrity for Custid
+c)	Bill_amt should not exceed Rs.12000
+d)	Bill date should be today?s date.                					      
+On successful insertion of the record display a success message. Handle all possible exceptions if any of the rules is violated	
+
+
+
+CREATE TABLE BILL(BID NUMBER,CUSTID NUMBER,BILLAMT NUMBER,BILLDATE DATE);
+
+INSERT INTO BILL (BILLID,CID,BIIL_AMT) VALUES (1,1236,11000);
+
+CREATE OR REPLACE PROCEDURE GEN_BILL (CID NUMBER,BILL_AMT NUMBER,BILL_DATE DATE DEFAULT SYSDATE)
+AS
+TEMP INT;
+TEMP1 INT;
+BEGIN
+
+SELECT MAX(BID) INTO TEMP FROM BILL;
+TEMP1:=TEMP+1;
+
+IF (BILL_AMT<12000) THEN
+
+INSERT INTO BILL VALUES (TEMP1,CID,BILL_AMT,BILL_DATE);
+DBMS_OUTPUT.PUT_LINE('ROW INSERTED');
+ELSE
+DBMS_OUTPUT.PUT_LINE('NOTHING');
+END IF;
+
+END;
+/
+
+**********************************************************
+
+DAY 4
+
+Practice 7
+
+Create a stored procedure create_author_details which takes pri_authr_name, country, email_id as parameters to insert one record in scholars table. 		
+
+  Before inserting it checks the following,
+i.	Write logic to generate next pri_authr_id in same series like 'A007' after 'A006' 
+ii.	Check no constraints should be violated
+iii.	If no constraints are violated insert the record in to scholars table, otherwise raise and handle the exception.
+
+Note: scholar_domain_publication schema
+
+
+
+
+
+
+
+
+
+*************************************************************************************************************
+
+						PACKAGES
+1.DEFN OF WHAT PACKAGE CONATINS
+ IT MEANS DEDCLARING THE CONTAINS OF PACKAGE
+  MENTIONING SIGNATURE OF PROCEDURE OF FUNCTION.
+2.DEFINE THE BODY OF FUNCTION AND PROCEDURES BELONGING TO THE PACKAGE.
+
+FUNCTION OR PROCEDURE IS TO BE CALLED, THT BELONGING TO PACKAGE, WE MUST MENTION PACKAGE NAME FOLLOWED BY PROCEDURE OR FUNCTION NAME.
+
+
+CREATE OR REPLACE  PACKAGE ICECREAM
+AS
+FUNCTION SNOWFALL(DEPT IN NUMBER)RETURN NUMBER;
+FUNCTION SNOW(DELL IN VARCHAR2)RETURN NUMBER;
+END ICECREAM;
+/
+
+
+
+
+CREATE OR REPLACE  PACKAGE BODY ICECREAM
+IS
+FUNCTION SNOWFALL(DEPT IN NUMBER) RETURN NUMBER
+IS 
+DD INT;
+BEGIN
+DD:=DEPT+100;
+RETURN DD;
+END SNOWFALL;
+
+FUNCTION SNOW(DELL IN VARCHAR2) RETURN NUMBER
+IS 
+BEGIN
+DBMS_OUTPUT.PUT_LINE(DELL);
+RETURN 1000;
+END SNOW;
+END ICECREAM;
+/
+
+
+
+
+
+EXEC DBMS_OUTPUT.PUT_LINE(ICECREAM.SNOWFALL(50));
+EXEC DBMS_OUTPUT.PUT_LINE(ICECREAM.SNOW(50));
+
+
+
+
+
+
+EXEC MAIN.DHHNE;
+EXEC MAIN.RAISE(7876);
+**********************************************************************************
+
+
+CREATE A PACKAGE HAVING 2 PROCEDURE AND A FUNCTION  
+
+PROCEDURE SHOULD BE DESIGNED  TO FIND DEPARTMENT HAVING HIGHEST NUMBER OF EMPLOYEE
+
+PROCEDURE SHOULD BE DESIGED TO GIVE RAISE
+
+MANAGER 3%
+CLERK 10% AND OTHER 7.5%
+
+
+AND A FUNCTION TO CHECK THE EXISTENCE OF THE EMPLOYEE WHOSE BASIC IS TO BE RAISED.
+
+
+******************************
+
+
+
+CREATE OR REPLACE  PACKAGE MAIN
+IS
+PROCEDURE DHHNE;
+PROCEDURE RAISE (RAI IN NUMBER);
+FUNCTION EXI (CHK IN NUMBER)RETURN NUMBER;
+END MAIN;
+/
+
+
+
+
+*******************************
+
+CREATE OR REPLACE  PACKAGE BODY MAIN
+IS
+
+
+PROCEDURE RAISE(RAI NUMBER)
+IS 
+CURSOR K1 IS SELECT * FROM EMP WHERE EMPNO=RAI;
+INFO K1%ROWTYPE;
+BEGIN
+OPEN K1;
+FETCH K1 INTO INFO;
+IF (INFO.JOB='MANAGER') THEN
+UPDATE DUMM
+SET SAL=SAL*1.03
+WHERE EMPNO=RAI;
+ELSIF (INFO.JOB='CLERK') THEN
+UPDATE DUMM
+SET SAL=SAL*1.10
+WHERE EMPNO=RAI;
+ELSE
+UPDATE DUMM
+SET SAL=SAL*1.075
+WHERE EMPNO=RAI;
+END IF;
+CLOSE K1;
+END RAISE;
+
+
+
+
+FUNCTION EXI (CHK IN NUMBER) RETURN NUMBER
+IS 
+COIN NUMBER;
+BEGIN
+SELECT COUNT(EMPNO) INTO COIN FROM DUMM WHERE EMPNO=CHK;
+IF COIN>=1 THEN
+DBMS_OUTPUT.PUT_LINE('EMPLOYEE EXISTS');
+RETURN 1;
+ELSE
+DBMS_OUTPUT.PUT_LINE('EMPLOYEE DOESNT EXISTS');
+RETURN 2;
+END IF;
+END EXI;
+
+
+
+
+PROCEDURE DHHNE
+
+IS
+DEP NUMBER;
+BEGIN
+
+SELECT DEPTNO INTO DEP FROM (SELECT DEPTNO,COUNT(EMPNO) C FROM EMP GROUP BY DEPTNO ORDER BY C DESC) WHERE ROWNUM=1;
+
+DBMS_OUTPUT.PUT_LINE('MAX EMPLOYEESS IN DEPT IS'||DEP);
+
+END DHHNE;
+
+
+END MAIN;
+/
+
+
+EXEC MAIN.RAISE(7876);
+EXEC DBMS_OUTPUT.PUT_LINE(MAIN.EXI(7876));
+EXEC MAIN.DHHNE;
+
+*****************************************
+
+
+CREATE OR REPLACE PACKAGE ICECREAM
+AS
+CURSOR EMP_CURSOR IS
+SELECT * FROM EMP;
+CNT INT;
+PROCEDURE TEXT_EX(A INT);
+FUNCTION CALCULATION(A INT) RETURN NUMBER;
+END;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY ICECREAM
+IS 
+PROCEDURE TEXT_EX(A INT)
+AS
+EMPREC EMP%ROWTYPE;
+BEGIN
+OPEN EMP_CURSOR;
+LOOP
+FETCH EMP_CURSOR INTO EMPREC;
+IF(EMPREC.DEPTNO=A) THEN
+DBMS_OUTPUT.PUT_LINE(EMPREC.EMPNO||' '||EMPREC.ENAME);
+END IF;
+END LOOP;
+
+CLOSE EMP_CURSOR;
+END;
+
+FUNCTION CALCULATION (A INT) RETURN NUMBER
+AS
+BEGIN
+RETURN A*A;
+END;
+END ICECREAM;
+/
+
+
+
+**************************************************************************************************************
+
+
+DAY 5
+PACKAGES
+
+Practice 1
+
+?	Create a package named MANAGE_EMP_PACK that has two public procedures, two package level variables and a private function. The public procedure HIRE_EMP adds an employee record in EMPLOYEES table and the public procedure FIRE_EMP deletes an employee record from the EMPLOYEES table. The two variables v_insert_cnt and v_delete_cnt are used in the package, for keeping record of the numbers of times insert / delete has been executed. 
+Create a private function VALIDATE_EMP in the package to validate employee number. This function can be called from HIRE_EMP and FIRE_EMP.
+?	The function VALIDATE_EMP accepts an employee number in a parameter p_eno and returns TRUE if the value of employee number exists in the EMPLOYEES table else it returns FALSE.
+?	The procedure HIRE_EMP takes all the column values of the EMPLOYEES table as parameters. It gives a call to VALIDATE_EMP by passing on the value of employee number and if the function returns TRUE then it displays message ?Employee number already in use?. If the function returns FALSE then it inserts a new record in the EMPLOYEES table and displays a message ?One employee added?. It also increments the value of v_insert_cnt by 1.
+?	The procedure FIRE_EMP accepts an employee number as a parameter and gives a call to VALIDATE_EMP by passing on the value of employee number. If the function returns TRUE then it deletes the corresponding record from the EMPLOYEES table, displays message ?One employee deleted? and increments the value of v_delete_cnt by 1. If the function returns FALSE then it displays message ?Wrong employee number?.
+?	Check working of the methods in MANAGE_EMP_PACK by giving calls to the public procedures and by displaying value of the appropriate package variable, through an anonymous block 
+
+
+
+CREATE OR REPLACE PACKAGE MANAGE_EMP_PACK
+IS
+PROCEDURE HIRE_EMP(P_ENO NUMBER, ENAM VARCHAR2,JB VARCHAR2,MGRR NUMBER,SALY NUMBER,COM NUMBER,DEPTNUM NUMBER,HIRE_DATE DATE DEFAULT SYSDATE);
+PROCEDURE FIRE_EMP(P_ENO NUMBER);
+V_INSERT_CNT INT DEFAULT 0;
+V_DELETE_CNT INT DEFAULT 0;
+END;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY MANAGE_EMP_PACK
+IS
+
+
+
+
+FUNCTION VALIDATE_EMP(P_ENO NUMBER) RETURN BOOLEAN
+IS 
+E1 NUMBER;
+BEGIN
+SELECT COUNT(EMPNO) INTO E1 FROM DUMM WHERE EMPNO=P_ENO;
+IF E1=1 THEN
+RETURN TRUE;
+ELSE 
+RETURN FALSE;
+END IF;
+END VALIDATE_EMP;
+
+PROCEDURE HIRE_EMP(P_ENO NUMBER, ENAM VARCHAR2,JB VARCHAR2,MGRR NUMBER,SALY NUMBER,COM NUMBER,DEPTNUM NUMBER,HIRE_DATE DATE)
+IS
+ANS BOOLEAN;
+BEGIN
+ANS:=VALIDATE_EMP(P_ENO);
+IF ANS THEN
+DBMS_OUTPUT.PUT_LINE('Employee number already in use');
+ELSE
+DBMS_OUTPUT.PUT_LINE('THERES NO EMPLOYEE SO WE WILLL ADD EMPLOYEE');
+INSERT INTO DUMM (EMPNO,ENAME,JOB,MGR,SAL,COMM,DEPTNO,HIREDATE) VALUES(P_ENO, ENAM,JB,MGRR,SALY,COM,DEPTNUM,HIRE_DATE);
+DBMS_OUTPUT.PUT_LINE('One employee added');
+END IF;
+END HIRE_EMP;
+
+PROCEDURE FIRE_EMP(P_ENO NUMBER) 
+IS
+ANS BOOLEAN;
+BEGIN
+ANS:=VALIDATE_EMP(P_ENO);
+IF ANS THEN
+DELETE FROM DUMM WHERE EMPNO=P_ENO;
+DBMS_OUTPUT.PUT_LINE('One employee deleted');
+ELSE
+DBMS_OUTPUT.PUT_LINE('Wrong employee number');
+END IF;
+END FIRE_EMP;
+END MANAGE_EMP_PACK;
+/
+
+
+*******************************
+
+EXEC MANAGE_EMP_PACK.HIRE_EMP(7850,'ZACK','ANALYST',7876,900,0,10);
+
+
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE AHJ(ENO EMP%ROWTYPE)
+AS
+BEGIN
+DBMS_OUTPUT.PUT_LINE(ENO.EMPNO||' '||ENO.ENAME);
+END;
+/
+
+
+
+
+
+DECLARE
+EDATA EMP%ROWTYPE;
+BEGIN
+SELECT * INTO EDATA FROM EMP WHERE EMPNO=7900;
+AHJ(EDATA);
+END;
+/
+
+
+
+DECLARE
+EDATA EMP%ROWTYPE;
+BEGIN
+SELECT * INTO EDATA FROM EMP WHERE EMPNO=7900;
+DBMS_OUTPUT.PUT_LINE(EDATA.EMPNO||' '||EDATA.ENAME);
+END;
+/
+
+
+**********************************************************************************************************************************************
+
+
+		OBJECT
+
+
+CREATE TYPE FRUIT AS OBJECT (
+PLACE VARCHAR2(20),
+PERISHABLE CHAR(1)
+);
+/
+
+
+
+DECLARE
+F1 FRUIT;
+
+BEGIN
+F1:=FRUIT('PARIS','Y');
+
+DBMS_OUTPUT.PUT_LINE(F1.PLACE||' '||F1.PERISHABLE);
+
+
+END;
+/
+
+*************************************************
+
+
+DEFINE AN OBJECT TO STORE THE DETAILS OF GAMES HAVING GAMEID AND GAMENAME
+
+
+CREATE TYPE GAME AS OBJECT(
+GAME_ID NUMBER,
+GAME_NAME VARCHAR2(20)
+);
+/
+
+DECLARE 
+G1 GAME;
+
+BEGIN
+
+G1:=GAME(1209,'NFS');
+DBMS_OUTPUT.PUT_LINE(G1.GAME_ID||' '||G1.GAME_NAME);
+
+END;
+/
+
+*************************************************
+
+
+CREATE TYPE FRUITY AS OBJECT(
+PLACE VARCHAR2(20),
+SUPPLIED CHAR(1)
+);
+/
+
+CREATE TABLE TF(ID INT, CNAME VARCHAR2(20),DATA FRUITY);
+
+INSERT INTO TF VALUES(1,'SAM',FRUITY('NAGPUR','Y'));
+
+INSERT INTO TF VALUES(2,'TOM',FRUITY('JALGAON','N'));
+
+
+
+SELECT C.DATA.PLACE,C.DATA.SUPPLIED FROM TF C; 
+
+SELECT C.DATA.PLACE,C.DATA.SUPPLIED FROM TF C WHERE C.ID=1;
+
+****************************************************
+
+DAY 6
+Objects 
+
+Practice 1
+
+?	Create a user defined data type named ?MARKS_TYPE? having the following subfields
+
+Column	Data type and size
+Subject	VARCHAR 2 (25)
+midTermMarks	NUMBER (3)
+annualMarks	NUMBER(3)
+
+
+?	Create an object table with name ?MYMARKS? having a single column of type MARKS_TYPE.
+?	Insert any 3 records in the table with relevant data
+?	Fire an appropriate SELECT command to get midTermMarks and annualMarks for all records for the given subject
+
+
+CREATE TYPE MARKS_TYPE AS OBJECT
+(
+SUBJECT VARCHAR2(25),
+MIDTERM_MARKS NUMBER(3),
+ANNUAL_MARKS NUMBER(3)
+);
+/
+
+
+
+
+CREATE TABLE MYMARKS (DATA MARKS_TYPE);
+
+INSERT INTO MYMARKS VALUES(MARKS_TYPE('MATHS',67,99));
+INSERT INTO MYMARKS VALUES(MARKS_TYPE('PHY',55,69));
+INSERT INTO MYMARKS VALUES(MARKS_TYPE('ALG',65,89));
+
+SELECT X.DATA.SUBJECT,X.DATA.MIDTERM_MARKS,X.DATA.ANNUAL_MARKS FROM MYMARKS X;
+
+
+*********************************************************
+
+
+CREATE OR REPLACE TYPE SAUCE IS VARRAY(3) OF INT;
+/
+
+
+CREATE TABLE TQ (ID INT, DATA SAUCE);
+
+INSERT INTO TQ VALUES(11,SAUCE(10,20));
+INSERT INTO TQ VALUES(13,SAUCE(30,80,90));
+INSERT INTO TQ VALUES(16,SAUCE(10));
+
+
+
+SELECT X.ID ,X.DATA FROM TQ X;
+SELECT ID,X.DATA FROM TQ X;
+
+
+
+SELECT * FROM TABLE(SELECT X.DATA FROM TQ X WHERE X.ID=11);
+
+SELECT COUNT(*) FROM TABLE(SELECT X.DATA FROM TQ X WHERE X.ID=11);
+
+*****************************************
+
+CREATE TABLE TABL (DATA VARR);
+
+CREATE OR REPLACE TYPE VARR IS VARRAY(3) OF HUMANE;
+/
+
+CREATE TYPE HUMANE AS OBJECT
+(
+MAN VARCHAR2(25),
+WOMAN VARCHAR2(25),
+CHILD VARCHAR2(25)
+);
+/
+
+
+INSERT INTO TABL VALUES(VARR(HUMANE('RAJ','SIMI','BABY'),HUMANE('JOHN','SAM','ANGEL')));
+
+SELECT X.DATA FROM TABL X;
+*SELECT * FROM TABLE(SELECT X.DATA FROM TABL X); 
+
+
+********************************************************
+
+
+
+ARRAY.
+
+CREATE TYPE JAM2 AS OBJECT(
+COMP_NAME VARCHAR2(20),
+COLOR VARCHAR2(20)
+);
+/
+
+CREATE TYPE JAMTYPE1 AS TABLE OF JAM2;
+
+-----NESTED TABLEOBJECT CREATED NAMED JAMTYPE1
+
+
+
+CREATE TABLE M2 (
+ID INT,
+LOCN VARCHAR2(20),
+FOOD1 JAMTYPE1)
+NESTED TABLE FOOD1 STORE AS JAMS1;
+
+--FOOD1 COLUMN NAME
+------THIS MEANS THAT THE NESTED TABLE DEFN WILL NOT BE STORED WITH TABLE BUT REFERRED BY JAMS1
+
+
+
+
+INSERT INTO M2 VALUES(11,'GUJRAT',JAMTYPE1(JAM2('NESTLE','RED'),
+JAM2('KISSAN','YELLOW'),JAM2('PATANJALI','GREEN')));
+
+INSERT INTO M2 VALUES(12,'MAHARASHTRA',JAMTYPE1(JAM2('PG','PINK'),
+JAM2('MK','PALE YELLOW'),JAM2('BI','MAROON')));
+
+
+
+
+SELECT A.ID,A.LOCN,T.COMP_NAME FROM M2 A,TABLE(A.FOOD1) T;
+
+SELECT A.ID,A.LOCN,T.COMP_NAME FROM M2 A,TABLE(A.FOOD1) T WHERE T.COMP_NAME='NESTLE';
+
+UPDATE TABLE (SELECT FOOD1 FROM M2 WHERE ID=11)
+SET COLOR='BLUE' WHERE COMP_NAME='NESTLE';
+
+
+
+*********************************************************
+day 6 
+objects
+
+Practice 3
+
+?	Create user defined data type named ?ICECREAM_TYPE? with the following data members
+
+Column	Data type and size
+flovorNo	NUMBER(2)
+Fname	VARCHAR(10)
+Cost	NUMBER(3)
+Hastopping	CHAR(1)   
+Can be Y or N
+
+?	Create table named ?menu? with the following design and insert five records into it.
+
+Column	Data type and size	Constraint
+MenuNo	NUMBER(2)	Primary key
+mainCourse	VARCHAR2(15)	Not Null
+Desert	ICECREAM_TYPE	
+Colddrink	CHAR(6)	
+
+
+?	Retrieve cost and name of an icecream from menu by specifying its flavor number.
+?	Update cost and maincourse column  from menu by specifying its MenuNo.
+
+
+
+
+
+CREATE TYPE ICECREAM_TYPO AS OBJECT(
+FLOVORNO NUMBER(2),
+FNAME VARCHAR(10),
+COST NUMBER(3),
+HASTOPPING CHAR(1)   
+);
+/
+
+CREATE TABLE MENU(MENUNO NUMBER(2) PRIMARY KEY,
+MAINCOURSE VARCHAR2(15) NOT NULL,
+DESERT ICECREAM_TYPO,	
+COLDDRINK CHAR(6));
+/
+
+
+INSERT INTO MENU VALUES(1,'XYZ',ICECREAM_TYPO(1,'VANILLA',100,'Y'),'COKE');
+
+INSERT INTO MENU VALUES(2,'ABC',ICECREAM_TYPO(2,'BS',200,'N'),'MILK');
+
+UPDATE MENU C
+SET C.DESERT.COST=900,
+C.MAINCOURSE='NEW'
+WHERE MENUNO=2;
+
+SELECT * FROM MENU;
+SELECT C.MENUNO,C.MAINCOURSE,C.DESERT.COST FROM MENU C WHERE C.MENUNO=2;
+
+********************************************************
+
+
+
+RAISE APPLICATION ERROR PREDEFINED
+
+
+
+
+DECLARE
+VID INT;
+	BEGIN
+	VID:=&UID;
+	IF(VID<18) THEN
+	RAISE_APPLICATION_ERROR(-20001,'AGE SHOULD BE MORE THAN 18');
+	END IF;
+
+		EXCEPTION 
+		WHEN OTHERS THEN
+		IF SQLCODE=-20001 THEN
+		DBMS_OUTPUT.PUT_LINE('NOTHING');
+		DBMS_OUTPUT.PUT_LINE(SQLERRM);
+		END IF;
+
+END;
+/
+
+
+
+DECLARE
+INVALID_AGE EXCEPTION;
+TR13_1 EXCEPTION;
+VID INT;
+PRAGMA EXCEPTION_INIT(INVALID_AGE,-45000);
+PRAGMA EXCEPTION_INIT(TR13_1,-40000);
+	BEGIN
+	VID:=&UID;
+	IF(VID<18) THEN
+	RAISE INVALID_AGE;
+	ELSIF(VID>35) THEN
+	RAISE TR13_1;
+	END IF;
+		DBMS_OUTPUT.PUT_LINE('AGE ENTERED WAS= '||VID);
+
+		EXCEPTION 
+	WHEN OTHERS THEN
+	IF(SQLCODE=-45000) THEN
+	DBMS_OUTPUT.PUT_LINE('AGE MENTIONED WAS BELOW 18');
+	ELSIF(SQLCODE=-40000) THEN	
+	DBMS_OUTPUT.PUT_LINE('AGE MENTIONED WAS ABOVE 35');
+
+	END IF;
+END;
+/
+
+**************************************************************************************************************
+
+
+
+TRIGGER
+
+
+STATEMENT LEVEL TRIGGER
+
+CREATE OR REPLACE TRIGGER TRG_1
+BEFORE INSERT ON EMPTMP1
+BEGIN
+DBMS_OUTPUT.PUT_LINE('TRIGGER GOT EXECUTED');
+END;
+/
+
+INSERT INTO EMPTMP1 VALUES(12345,'FAIRY',8000);
+
+******************
+
+
+PSEUDO COLUMS
+
+:NEW
+:OLD
+
+DROP TRIGGER TRG_1;
+
+CREATE OR REPLACE TRIGGER TRG_1
+AFTER UPDATE ON EMPTMP1 FOR EACH ROW
+BEGIN
+INSERT INTO EMPTMP12 VALUES
+(:OLD.DEPTNO,:OLD.ENAME,:OLD.SAL);
+DBMS_OUTPUT.PUT_LINE('OLD RECORDS STORED IN TEMP TABLE');
+END;
+/
+
+UPDATE EMPTMP1
+SET ENAME='PPP'
+WHERE EMPNO=7934;
+
+====
+
+
+CREATE OR REPLACE TRIGGER TRG_1
+AFTER INSERT OR DELETE OR UPDATE  ON EMPTMP1 FOR EACH
+ROW
+BEGIN
+INSERT INTO EMPTMP12 VALUES
+(:NEW.DEPTNO,:NEW.ENAME,:NEW.SAL);
+DBMS_OUTPUT.PUT_LINE('OLD RECORDS STORED IN TEMP TABLE');
+END;
+/

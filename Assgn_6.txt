@@ -1,0 +1,140 @@
+1)
+--CREATION
+	create or replace type MARKS_TYPE as object
+	(Subject VARCHAR2(25),
+	midTermMarks NUMBER(3),
+	annualMarks NUMBER(3));
+	/
+
+	create table MYMARKS (name varchar2(15),marks MARKS_TYPE);
+	
+  	insert into  MYMARKS values('kartick',MARKS_TYPE('java',80,90));
+	insert into  MYMARKS values('trump',MARKS_TYPE('politics',88,99));
+	insert into  MYMARKS values('ivanka',MARKS_TYPE('beauty',90,100));
+
+	select * from MYMARKS;
+	select m.marks.Subject   from  MYMARKS  m where name='ivanka';
+------------------------------------------------------------------------------------------------------------
+SQL> select m.marks.Subject   from  MYMARKS  m where name='ivanka';
+
+MARKS.SUBJECT
+-------------------------
+beauty
+==================================================================================================
+2)	
+	create or replace type  MARK_TYPE as object
+	(studentName VARCHAR2(25),
+	 Score MARK_TYPE);
+	/
+	
+	create table students(studentName VARCHAR2(25),
+	rollNo NUMBER(3) Primary Key, Score MARKS_TYPE);
+	
+	insert into students values('kartick',1,MARKS_TYPE('java',80,90));
+	insert into  students values('trump',2,MARKS_TYPE('politics',88,99));
+	insert into  students values('ivanka',3,MARKS_TYPE('beauty',90,100));
+
+	select * from students;
+	
+	--TO UPDATE
+	--ALIAS
+
+	select s.score.annualMarks  from  students s where rollNo=2;
+ 	update students s set s.score.annualMarks=(s.score.annualMarks+ 5) where rollNo=2;
+==================================================================================================
+3)
+ 	create or replace type ICECREAM_TYPE as object
+	(flovorNo NUMBER(2),
+	Fname VARCHAR(10),
+	Cost NUMBER(3),
+	Hastopping CHAR(1)  );
+	/
+
+--CREATE BODY
+	
+	create table menu(MenuNo NUMBER(2) Primary key, mainCourse VARCHAR2(15), Colddrink CHAR(6),
+	Desert ICECREAM_TYPE);
+	
+	insert into menu values(1,'rice','appy',ICECREAM_TYPE(20,'choco',300,'y'));
+	insert into menu values(2,'dosa','fruT',ICECREAM_TYPE(30,'chips',400,'y'));	
+	insert into menu values(3,'paratha','sprite',ICECREAM_TYPE(40,'scotch',500,'y'));	
+
+	select m.desert.Fname ,m.desert.cost from menu m where m.desert.flovorNo=20;
+--OUTPUT
+DESERT.FNA DESERT.COST
+---------- -----------
+choco              300
+	
+update menu m set m.desert.cost =400, mainCourse ='tikka' where MenuNo=1;
+
+ --OUTPUT
+    MENUNO MAINCOURSE      COLDDR
+---------- --------------- ------
+DESERT(FLOVORNO, FNAME, COST, HASTOPPING)
+-----------------------------------------------
+         1 tikka           appy
+ICECREAM_TYPE(20, 'choco', 400, 'y')
+==================================================================================================
+                                                                              ***COLLECTION***
+
+2)
+	create or replace type CUST_TAB as object
+	(Cust_id number, Cust_Name varchar2(20), Plan_Name varchar2(20)); 
+	/
+	
+	create type CUST_DETAILS  as varray(5) of  CUST_TAB ;
+	/
+	
+	create table Cust_Tab_details( Srno Number(10) Primary Key ,Cust_Info CUST_DETAILS ,Cust_number Number(10));
+	
+	insert into Cust_Tab_details values(5,CUST_DETAILS(CUST_TAB(202, 'vishal','laddak')), 942236514);
+	insert into Cust_Tab_details values(6,CUST_DETAILS(CUST_TAB(203, 'shubham','goa')), 11111);
+	insert into Cust_Tab_details values(7,CUST_DETAILS(CUST_TAB(204, 'chitte','gondia')), 22222);
+	
+	declare 
+	var cust_details;
+	cursor  c1 is select * from Cust_Tab_details ;
+	begin
+	for y in c1
+	loop
+	select Cust_Info into var from Cust_Tab_details where Srno=y.Srno;
+	for x  in 1..var.count
+	loop
+	dbms_output.put_line(' cust id :'|| var(x).cust_id||' cust name :'||var(x).cust_name );
+	end loop;
+	end loop;
+	end;
+	/
+	
+===============================================================================================
+4)
+            	create or replace type VEHICLE_TYPE as object
+	(vehicle_no varchar2(12), vehicle_type char(1), monthly_expense number(7));
+	/
+
+	create type vehicle_arr as varray(3) of vehicle_type ;
+	/
+	
+	create table emp_varray(emp_no number(4), emp_name varchar2(30), vehiclelist vehicle_arr);
+	
+	insert into emp_varray values(1111, 'zhang', vehicle_arr(vehicle_type(1234,'T',4000)));
+	insert into emp_varray values(2222, 'swag', vehicle_arr(vehicle_type(5678,'F',9000)));
+
+	create or replace procedure add_vehicle_details as
+	empno emp_varray.emp_no%type;
+	begin
+	
+==================================================================================================
+ create or replace type skills_type as object
+( skill_id number(2),
+skill_name varchar2(20),
+skill_rating number(2));
+
+create  type skill_tab_type as table of skills_type;
+	
+		
+		
+	
+
+	
+	 

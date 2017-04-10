@@ -1,0 +1,340 @@
+Q1.  [9 Marks] [RIGHT BUT SEE EXCEPTIONS]	(40 minutes)
+Create a package pkg_sal with private function as sal_calc and a public procedure show_sal as follows:
+Private Function sal_calc will accept employee number and return 1 if 
+employee number is valid else 0 if not valid.
+Public Procedure show_sal will accept employee number of individual.
+Procedure should call the function sal_calc and if employee number is valid it should find the total and average salary paid to that department to which employee belongs.  
+In case function returns 0, procedure should display the appropriate error message by handling the error.
+In case function returns 1, procedure should display the information in the following format:
+
+================================================
+Employee Number:__________Name of the employee:____________
+Department Number: __________
+================================================
+Total Salary Paid in the department: ________
+Average Salary Paid in the department: ________
+Minimum Salary paid in the department:_________
+Maximum Salary paid in the department : __________
+================================================
+DOES AFTER EXCEPTION RAISED PROGRAM QUITS?
+==============
+CREATE OR REPLACE PACKAGE PKG_SAL
+IS
+PROCEDURE SHOW_SAL(ENO NUMBER);
+END PKG_SAL;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY PKG_SAL
+IS
+AB EXCEPTION;
+FUNCTION SAL_CALC(ENO1 NUMBER) RETURN NUMBER
+IS
+TEMP1 NUMBER;
+BEGIN
+SELECT COUNT(EMPNO) INTO TEMP1 FROM EMP WHERE EMPNO=ENO1;
+IF TEMP1>0 THEN
+RETURN 1;
+ELSE 
+RAISE AB;
+RETURN 0;
+END IF;
+END SAL_CALC;
+
+
+
+PROCEDURE SHOW_SAL(ENO NUMBER)
+IS
+DNO NUMBER;
+ENAM VARCHAR2(20);
+AV NUMBER;
+SSAL NUMBER;
+MAXI NUMBER;
+MINI NUMBER;
+ANS NUMBER;
+BEGIN
+ANS:=SAL_CALC(ENO);
+IF ANS=1 THEN
+SELECT ENAME,DEPTNO INTO ENAM,DNO FROM EMP WHERE EMPNO=ENO;
+SELECT AVG(SAL),SUM(SAL) INTO AV,SSAL FROM EMP WHERE DEPTNO=DNO;
+SELECT MAX(SAL),MIN(SAL) INTO MAXI,MINI FROM EMP WHERE DEPTNO=DNO;
+DBMS_OUTPUT.PUT_LINE('EMPLOYEE NUMBER: '||ENO||CHR(9)||'NAME OF EMPLOYEE: '||ENAM);
+DBMS_OUTPUT.PUT_LINE('DEPARTMENT NUMBER: '||DNO);
+DBMS_OUTPUT.PUT_LINE('TOTAL SAL: '||SSAL);
+DBMS_OUTPUT.PUT_LINE('AVG SAL : '||AV);
+DBMS_OUTPUT.PUT_LINE('MAX SAL: '||MAXI);
+DBMS_OUTPUT.PUT_LINE('MIN SAL: '||MINI);
+END IF;
+
+
+EXCEPTION
+WHEN AB THEN DBMS_OUTPUT.PUT_LINE('PLEASE ENTER CORRECT NO.');
+WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE('NO DATA FOUND');
+WHEN OTHERS THEN DBMS_OUTPUT.PUT_LINE('OTHERS');
+
+END SHOW_SAL;
+
+END PKG_SAL;
+/
+
+EXEC PKG_SAL.SHOW_SAL(7934);
+
+========================================================================
+
+
+
+
+
+Q2. [9 marks] [RIGHT]	(40 Minutes) 
+Create a procedure Show_Details which will take Mgr as input and do the following validations:
+
+1.	If mgr doesn?t exists then handle the Predefined named exception with appropriate error msg.
+2.	If mgr exists then display the details in the following way. If commission is NULL then it should be displayed as 0. 
+
+Magaer Id:________
+Manager Name:_________
+Depatment Name:_____________
+
+******************************************************
+ Sr No     Employee ID   Employee Name	   Hiredate	   Commission
+******************************************************
+?.			?..			??			?.
+?			?..			??			?.	
+
+******************************************************
+
+CREATE OR REPLACE PROCEDURE SHOW_DETAILS(MG NUMBER)
+AS
+MG1 NUMBER;
+TEMP NUMBER;
+TEMP1 NUMBER;
+TEMP2 NUMBER;
+ENAM VARCHAR2(20);
+DEPTN NUMBER;
+CURSOR CUR(MG NUMBER) IS SELECT ROWNUM,EMPNO,ENAME,HIREDATE,NVL(COMM,0) N FROM EMP WHERE MGR=MG;
+EDATA CUR%ROWTYPE;
+BEGIN
+SELECT COUNT(EMPNO) INTO TEMP1 FROM EMP WHERE EMPNO=MG;
+IF TEMP1>0 THEN
+DBMS_OUTPUT.PUT_LINE('EMPLOYEE EXISTS');
+END IF;
+
+
+SELECT COUNT(MGR) INTO TEMP2 FROM EMP WHERE MGR=MG;
+IF TEMP2>0 THEN
+DBMS_OUTPUT.PUT_LINE('THAT EMPLOYEE IS A MANAGER');
+END IF;
+
+SELECT ENAME,DEPTNO INTO ENAM,DEPTN FROM EMP WHERE EMPNO=MG;
+
+DBMS_OUTPUT.PUT_LINE('MANAGER ID: '||MG);
+DBMS_OUTPUT.PUT_LINE('MANAGER NAME: '||ENAM);
+DBMS_OUTPUT.PUT_LINE('DEPARTMENT NAME: '||DEPTN);
+
+DBMS_OUTPUT.PUT_LINE('SR.NO'||CHR(9)||'EMPNO'||CHR(9)||'EMPNAME'||CHR(9)||'HIREDATE'||CHR(9)||'COMM');
+
+OPEN CUR(MG);
+LOOP
+FETCH CUR INTO EDATA;
+EXIT WHEN CUR%NOTFOUND;
+
+DBMS_OUTPUT.PUT_LINE(EDATA.ROWNUM||CHR(9)||EDATA.EMPNO||CHR(9)||EDATA.ENAME||CHR(9)||EDATA.HIREDATE||CHR(9)||EDATA.N);
+
+END LOOP;
+CLOSE CUR;
+
+EXCEPTION
+WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE('NO DATA FOUND');
+WHEN OTHERS THEN DBMS_OUTPUT.PUT_LINE('OTHERS');
+
+
+END;
+/
+
+EXEC SHOW_DETAILS(7902);
+
+
+
+===============================================================================
+
+Q3  [9 marks]  (40 Minutes) [ALL RIGHT INSTEAD OF EXCEPTION(OR ERROR HANDLING ARE THESE DIFFERENT?) WHAT IF WE USE IF ELSE STATEMENT END IF THEN]
+
+Write a function GET_Anual_Salary which accepts Dept_no as input & returns annual Salary for that dept. 
+There should exception handling the error with proper message if wrong department no has been entered by the user. 
+Write an anonymous block to call the function and display the output in the below format. 
+Dept Id:______	
+Dept Name: __________________
+Annual Salary:_______________
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION GET_ANNUAL_SAL(DNO NUMBER) RETURN NUMBER
+AS
+ANNSAL NUMBER;
+COIN NUMBER;
+DNAM VARCHAR2(20);
+BEGIN
+SELECT COUNT(DEPTNO) INTO COIN FROM EMP WHERE DEPTNO=DNO;
+IF COIN>0 THEN
+DBMS_OUTPUT.PUT_LINE('DEPARTMENT EXISTS');
+SELECT (SUM(SAL))*12 INTO ANNSAL FROM EMP WHERE DEPTNO=DNO;
+SELECT DNAME INTO DNAM FROM DEPT WHERE DEPTNO=DNO;
+
+DBMS_OUTPUT.PUT_LINE('DEPT ID: '||DNO);
+DBMS_OUTPUT.PUT_LINE('DEPT NAME'||DNAM);
+DBMS_OUTPUT.PUT_LINE('ANNUAL SALARY: '||ANNSAL);
+RETURN 1;
+
+ELSE
+
+RETURN 0;
+END IF;
+
+
+END;
+/
+
+DECLARE
+ANS NUMBER;
+BEGIN
+ANS:=GET_ANNUAL_SAL(11);
+IF ANS=0 THEN
+DBMS_OUTPUT.PUT_LINE('PLEASE ENTER CORRECT VALUE');
+END IF;
+END;
+/
+
+
+
+
+=========================================================================
+
+Q4.  [10 Marks]   (50 Minutes) [RIGHT]
+Create a Package pkg_Show_details which has two overloaded procedures prEmpDetails as given below :			
+
+1.	Public procedure prEmpDetails accepts salary as parameter. 
+     The procedure should display the information (empno, ename, sal, deptno) for all  
+     the employees who are getting salary less or equal to as entered via parameter.   
+2.	Public procedure prEmpDetails accepts Hire Date of employee as parameter. The procedure should display the details (empno, ename, sal and deptno) of all the employees  for those who have joining on or after the date entered by the user as parameter. 
+Invoke the first procedure using anonymous block. And the second procedure from host environment.
+Note: Marks will be given only if the procedures are packaged procedures
+
+
+CREATE OR REPLACE PACKAGE PKG_SHOW_DETAILS
+IS
+PROCEDURE PREMPDETAILS(SALY NUMBER);
+PROCEDURE PREMPDETAILS(HIRE DATE);
+END PKG_SHOW_DETAILS;
+/
+
+CREATE OR REPLACE PACKAGE BODY PKG_SHOW_DETAILS
+IS
+
+PROCEDURE PREMPDETAILS(SALY NUMBER)
+IS
+CURSOR CUR IS SELECT EMPNO,ENAME,DEPTNO,SAL FROM EMP WHERE SAL<=SALY;
+EDATA CUR%ROWTYPE;
+BEGIN
+OPEN CUR;
+LOOP
+FETCH CUR INTO EDATA;
+EXIT WHEN CUR%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(EDATA.EMPNO||CHR(9)||EDATA.ENAME||CHR(9)||EDATA.SAL||CHR(9)||EDATA.DEPTNO);
+END LOOP;
+CLOSE CUR;
+END PREMPDETAILS;
+
+
+PROCEDURE PREMPDETAILS(HIRE DATE)
+IS
+CURSOR CUR IS SELECT EMPNO,ENAME,SAL,DEPTNO FROM EMP WHERE HIREDATE>= HIRE;
+EDATA CUR%ROWTYPE;
+BEGIN
+OPEN CUR;
+LOOP
+FETCH CUR INTO EDATA;
+EXIT WHEN CUR%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(EDATA.EMPNO||CHR(9)||EDATA.ENAME||CHR(9)||EDATA.SAL||CHR(9)||EDATA.DEPTNO);
+END LOOP;
+CLOSE CUR;
+END PREMPDETAILS;
+
+END PKG_SHOW_DETAILS;
+/
+
+
+
+
+*****************************
+EXEC DBMS_OUTPUT.PUT_LINE(PKG_SHOW_DETAILS.PREMPDETAILS(950));
+
+EXEC DBMS_OUTPUT.PUT_LINE(PKG_SHOW_DETAILS.PREMPDETAILS(TO_DATE('1-1-1981','DD-MM-YYYY')));
+
+DECLARE
+BEGIN
+PKG_SHOW_DETAILS.PREMPDETAILS(950);
+PKG_SHOW_DETAILS.PREMPDETAILS(TO_DATE('1-1-1981','DD-MM-YYYY'));
+END;
+/
+
+============================================================================
+
+Q5. Book Order Related details need to be stored as given below
+
+Book_Code (P.K)	Order_Id	Amount
+B101	1	2000
+B102	4	2500
+	7	3070
+B103	3	5850
+	2	7400
+
+Define appropriate datatype, if required, and create the table capable of holding the above like values. Insert records for at least 2 parts. For each part provide details of at least 2 orders.
+Write a procedure updateOrder which accepts Book_Code, Order_Id and Amount as parameter and update the same in the table
+
+
+
+CREATE TYPE OID AS OBJECT
+(
+O_ID NUMBER
+);
+
+CREATE TYPE AMT AS OBJECT
+(
+A_MT NUMBER
+);
+
+CREATE TABLE XYZ(BOOK_CODE VARCHAR2(20),ORDER_ID OID,AMOUNT AMT);
+
+INSERT INTO XYZ VALUES('B101',OID(1),AMT(2000));
+INSERT INTO XYZ VALUES('B102',OID(4),OID(7),AMT(2500),AMT(3070));
+INSERT INTO XYZ VALUES('B103',OID(3),OID(2),AMT(5850),AMT(7400));
+
+================================
+SEE THIS ABOVE CODE RUNNING
+================================
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE UPDATEORDER(BOOK_CODE VARCHAR2(20),ORDER_ID1 NUMBER, ORDER_ID2 NUMBER,AMOUNT1 NUMBER,AMOUNT2 NUMBER)
+AS
+BEGIN
+INSERT INTO XYZ VALUES('BOOK_CODE',OID(ORDER_ID1),OID(ORDER_ID2),AMT(AMOUNT1),AMT(AMOUNT2));
+
+END;
+/
+
+
+DECLARE
+BEGIN
+EXEC UPDATEORDER('B104',5,4,6700,4500);
+END;
+/

@@ -1,0 +1,119 @@
+
+1)NESTED TABLE
+
+create type vehicle as object( vid number, vname varchar2(20));
+	create type vehicle_tab as table of vehicle;
+
+	create table person_d(pid number, pname varchar2(20), vehicle_details vehicle_tab)
+	nested table vehicle_details store as vehicle_details_tab;
+
+	insert into person_d values(1,'ivanka', vehicle_tab(vehicle(1,'bmmw'),vehicle(2,'rover')))
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+SQL> select * from person_d;
+
+       PID PNAME
+---------- --------------------
+VEHICLE_DETAILS(VID, VNAME)
+--------------------------------------------------------------
+         1 ivanka
+VEHICLE_TAB(VEHICLE(1, 'bmmw'), VEHICLE(2, 'rover'))
+
+===================================================================================================
+
+2)	declare 
+	new_vehicle vehicle_tab;
+	begin
+	new_vehicle:=vehicle_tab(vehicle(1,'tvs'),vehicle(2,'honda'));
+	update person_d set vehicle_details=new_vehicle where pid=1;
+	dbms_output.put_line('updated');
+	end;
+
+---------------------------------------------------------------------------------------------------------------------
+SQL> select * from person_d;
+
+       PID PNAME
+---------- --------------------
+VEHICLE_DETAILS(VID, VNAME)
+-----------------------------------------------------------------------
+         1 ivanka
+VEHICLE_TAB(VEHICLE(1, 'tvs'), VEHICLE(2, 'honda'))
+===================================================================================================
+3)
+declare
+l_name person_d.pname%type;
+l_vehicle person_d.vehicle_details%type;
+cursor get_data is select pname,vehicle_details from person_d;
+begin
+open get_data;
+loop
+fetch get_data into l_name,l_vehicle;
+exit when get_data%notfound;
+dbms_output.put_line('person name = '||l_name|| '      vehicle are');
+for x in 1..l_vehicle.count
+loop
+dbms_output.put_line(l_vehicle(x).vname);
+end loop;
+end loop;
+end;
+/
+--------------------------------------------------------------------------------------------------------------------
+person name = ivanka   vehicle are
+tvs
+honda
+
+PL/SQL procedure successfully completed.
+===================================================================================================
+4)
+update the (select vehicle_details from person_d where pid=1)
+set vname='new_vehicle_bmw' where vid=2;
+
+SQL> select * from  person_d;
+
+       PID PNAME
+---------- --------------------
+VEHICLE_DETAILS(VID, VNAME)
+--------------------------------------------------------------------
+         1 ivanka
+VEHICLE_TAB(VEHICLE(1, 'tvs'), VEHICLE(2, 'new_vehicle_bmw'))
+===================================================================================================
+5)
+insert into the (select vehicle_details from person_d where pid=1)
+values(vehicle(102,'kinetic'));
+----------------------------------------------------------------------------------------
+
+       PID PNAME
+---------- --------------------
+VEHICLE_DETAILS(VID, VNAME)
+--------------------------------------------------------------------------------
+         1 ivanka
+VEHICLE_TAB(VEHICLE(1, 'tvs'), VEHICLE(2, 'new_vehicle_bmw'), VEHICLE(102, 'kine
+tic'))
+===================================================================================================
+6)
+delete from the (select vehicle_details from person_d where pid=1)
+where vid=102;
+-----------------------------------------------------------------------------------------------------------
+
+       PID PNAME
+---------- --------------------
+VEHICLE_DETAILS(VID, VNAME)
+------------------------------------------------------------------
+         1 ivanka
+VEHICLE_TAB(VEHICLE(1, 'tvs'), VEHICLE(2, 'new_vehicle_bmw'))
+===================================================================================================
+7)
+  	  CREATE TYPE BOOKS_TYPE AS OBJECT ( BOOK_NO NUMBER(4),
+	BOOK_TITLE VARCHAR2(20),AUTHOR VARCHAR2(20) );.....object
+
+	CREATE TYPE BOOKS AS TABLE OF BOOKS_TYPE;....nested table of object
+
+	CREATE TABLE STUDENT( STUDENT_NO NUMBER(4) NOT NULL,
+	STUDENT_NAME VARCHAR2(25),BOOKS_ISSUED BOOKS)....Books_issued column of type nested table
+	
+ 	NESTED TABLE BOOKS_ISSUED STORE AS BOOK_TABLE;
+
+
+
+

@@ -1,0 +1,142 @@
+Q1. [10 marks]
+Write a Stored procedure GenerateReport which accept emp no as parameter and displays the details of all the employees in the following format:
+
+ Employees Getting Salary less than the given Emp No: 
+Sr No.	Empno 	Ename		Manager Name	Deptno
+1.		-----		-----		     -------		---------
+2.
+			           
+Employees Getting Salary More than the given Emp No: 
+Sr No.	Empno 	Ename		Manager Name	Deptno
+1.		-----		-----		     -------		---------
+2.
+			           
+
+Invoke the above procedure from an anonymous block.
+Handle exception with appropriate messages in case emp no is wrongly entered. 
+
+**************************************************************************************************************
+
+CREATE OR REPLACE PROCEDURE P1 (E1 INT) 
+AS
+
+
+CURSOR CUR IS SELECT * FROM EMP WHERE EMPNO=E1;
+EDATA CUR%ROWTYPE;
+CURSOR CUR1(S INT) IS SELECT * FROM EMP WHERE SAL>S;
+EDATA1 CUR1%ROWTYPE;
+BEGIN 
+OPEN CUR;
+
+LOOP
+FETCH CUR INTO EDATA;
+EXIT WHEN CUR%NOTFOUND;
+OPEN CUR1(EDATA.SAL);
+LOOP
+FETCH CUR1 INTO EDATA1;
+EXIT WHEN CUR1%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(EDATA1.ENAME||CHR(9)||EDATA1.SAL||CHR(9)||EDATA1.EMPNO);
+
+
+
+
+END LOOP;
+END LOOP;
+CLOSE CUR1;
+CLOSE CUR;
+END;
+/
+
+DECLARE
+
+BEGIN
+P1(7876);
+END;
+
+
+
+****************************************************************************************************************************************************************************************************************************
+**************************************************************************************************************
+
+
+Q2. 	[10 marks]
+Create a Package named Salary_Pack which contains a procedure and a function mentioned in Q2A and Q2B respectively   
+
+Q2A. 	Write a function validateID which takes deptno as argument and returns TRUE if it is a valid order else it returns FALSE.
+
+Q2B. 	Write a procedure Salary which accepts  deptno and do the following:
+
+?	Invoke the function validateDno by passing the deptno to it
+
+?	If deptno is valid, calculate the total, average, minimum & maximum salary of the emp with name and display the same in below format: 
+
+************************************************************
+Department No: _____		Department Name: ______
+************************************************************
+Minimum Salary : _______ Drawn by the Emp : _________(display name only)	
+Maximum Salary : _______ Drawn by the Emp : _________(display name only)
+************************************************************
+Average Salary of the department: _________
+Total Salary drawn by the department: ________
+  ************************************************************
+
+
+**************************************************************************************************************
+
+
+
+
+
+
+CREATE OR REPLACE PACKAGE SALARY_PACK
+IS 
+FUNCTION VALIDATE_ID(DNO NUMBER) RETURN BOOLEAN;
+PROCEDURE SALARY(DEPTNUM NUMBER);
+END SALARY_PACK;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY SALARY_PACK
+IS 
+FUNCTION VALIDATE_ID(DNO NUMBER) RETURN BOOLEAN
+IS
+TEMP NUMBER;
+BEGIN
+SELECT COUNT(DEPTNO) INTO TEMP FROM EMP WHERE DEPTNO=DNO;
+IF TEMP>0 THEN
+RETURN TRUE;
+ELSE
+RETURN FALSE;
+END IF;
+END VALIDATE_ID;
+
+PROCEDURE SALARY(DEPTNUM NUMBER)
+IS
+ANS BOOLEAN;
+AV NUMBER;
+TSAL NUMBER;
+MAXI NUMBER;
+MINI NUMBER;
+DNAM1 VARCHAR2(20);
+ENAM1 VARCHAR2(20);
+ENAM2 VARCHAR2(20);
+BEGIN
+
+ANS:=VALIDATE_ID(DEPTNUM);
+
+IF ANS THEN
+SELECT ENAME,SAL INTO ENAM2,MINI FROM EMP WHERE SAL=(SELECT MIN(SAL) FROM EMP WHERE DEPTNO=DEPTNUM);
+SELECT ENAME,SAL INTO ENAM1,MAXI FROM EMP WHERE SAL=(SELECT MAX(SAL) FROM EMP WHERE DEPTNO=DEPTNUM);
+ SELECT DNAME INTO DNAM1 FROM DEPT WHERE DEPTNO=DEPTNUM;
+SELECT AVG(SAL) INTO AV FROM EMP WHERE DEPTNO=DEPTNUM;
+SELECT SUM(SAL) INTO TSAL FROM EMP WHERE DEPTNO=DEPTNUM;
+DBMS_OUTPUT.PUT_LINE(AV || TSAL||MAXI||MINI||DNAM1||ENAM1||ENAM2);
+ELSE
+DBMS_OUTPUT.PUT_LINE('NOTHING');
+END IF;
+
+
+
+END SALARY;
+END SALARY_PACK;
+/
