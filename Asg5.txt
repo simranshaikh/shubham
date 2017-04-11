@@ -1,0 +1,689 @@
+
+**************************************************(1)**************************************************
+
+create or replace function VALIDATE_EMP  (p_eno emp.empno%type)  return boolean as
+	eno number:=0;
+begin
+	select count(*) into eno from emp where empno=p_eno;
+	if (eno = 0) then
+		return true;
+	else
+		return false;
+	end if;
+end;
+/
+
+create or replace procedure HIRE_EMP  (p_eno emp.empno%type, p_name emp.ename%type , p_job emp.job%type, p_mgr emp.mgr%type, p_hdt emp.hiredate%type, p_sal emp.sal%type, p_comm emp.comm%type, p_deptno emp.deptno%type) as
+	v_insert_cnt number;
+	ct number:=0;
+	invalid_emp exception;
+	invalid_mgr exception;
+begin
+	if validate_emp(p_eno) then
+		select count(*) into ct from emp where mgr=p_mgr;
+		if ct != 0 then
+			insert into emp values (p_eno,p_name,p_job,p_mgr,p_hdt,p_sal,p_comm,p_deptno);
+			v_insert_cnt:=v_insert_cnt+1;
+			dbms_output.put_line('One Employee added');
+		else
+			raise invalid_mgr;
+		end if;
+		
+	else
+		raise invalid_emp;
+	end if;
+
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+	when invalid_mgr then
+	dbms_output.put_line('Invalid Manager id');
+end;
+/
+
+execute hire_emp(7200,'Barkley','MANAGER',7839,'23-JUN-14',4000,NULL,20);
+
+create or replace procedure FIRE_EMP (p_eno emp.empno%type) as
+	v_delete_cnt number;
+	invalid_emp exception;
+begin
+	if validate_emp(p_eno) then	
+		raise invalid_emp;
+	else
+		delete from emp where empno=p_eno;
+		v_delete_cnt:=v_delete_cnt+1;
+		dbms_output.put_line('One Employeed deleted');
+	end if;
+
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+/
+
+execute fire_emp(7211);
+
+====================================================================================================================
+
+create or replace package MANAGE_EMP_PACK as
+v_insert_cnt number;
+v_delete_cnt number;
+procedure HIRE_EMP  (p_eno emp.empno%type, p_name emp.ename%type , p_job emp.job%type, p_mgr emp.mgr%type, p_hdt emp.hiredate%type, p_sal emp.sal%type, p_comm emp.comm%type, p_deptno emp.deptno%type);
+procedure FIRE_EMP (p_eno emp.empno%type);
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body MANAGE_EMP_PACK as
+
+function VALIDATE_EMP  (p_eno emp.empno%type)  return boolean as
+	eno number:=0;
+begin
+	select count(*) into eno from emp where empno=p_eno;
+	if (eno = 0) then
+		return true;
+	else
+		return false;
+	end if;
+end;
+
+procedure HIRE_EMP  (p_eno emp.empno%type, p_name emp.ename%type , p_job emp.job%type, p_mgr emp.mgr%type, p_hdt emp.hiredate%type, p_sal emp.sal%type, p_comm emp.comm%type, p_deptno emp.deptno%type) as
+	ct number:=0;
+	invalid_emp exception;
+	invalid_mgr exception;
+begin
+	if validate_emp(p_eno) then
+		select count(*) into ct from emp where empno=p_mgr;
+		if ct != 0 then
+			insert into emp values (p_eno,p_name,p_job,p_mgr,p_hdt,p_sal,p_comm,p_deptno);
+			v_insert_cnt:=v_insert_cnt+1;
+			dbms_output.put_line('One Employee added');
+		else
+			raise invalid_mgr;
+		end if;
+		
+	else
+		raise invalid_emp;
+	end if;
+
+exception
+	when invalid_emp then
+	dbms_output.put_line('Employee Id already exits');
+	when invalid_mgr then
+	dbms_output.put_line('Invalid Manager id');
+end;
+
+procedure FIRE_EMP (p_eno emp.empno%type) as
+	
+	invalid_emp exception;
+begin
+	if validate_emp(p_eno) then	
+		raise invalid_emp;
+	else
+		delete from emp where empno=p_eno;
+		v_delete_cnt:=v_delete_cnt+1;
+		dbms_output.put_line('One Employeed deleted');
+	end if;
+
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+begin
+v_insert_cnt:=0;
+v_delete_cnt:=0;
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute MANAGE_EMP_PACK.hire_emp(7200,'BARKLEY','MANAGER',7839,'23-JUN-14',4000,NULL,20);
+
+Invalid employee id
+
+PL/SQL procedure successfully completed.
+
+--------------------------------------------------------
+
+execute MANAGE_EMP_PACK.hire_emp(7211,'BARKLEY','MANAGER',7839,'23-JUN-14',4000,NULL,20);
+
+One Employee added
+
+PL/SQL procedure successfully completed.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute MANAGE_EMP_PACK.fire_emp(7100);
+
+Invalid employee id
+
+PL/SQL procedure successfully completed.
+
+--------------------------------------------------------
+
+execute MANAGE_EMP_PACK.fire_emp(7211);
+
+One Employeed deleted
+
+PL/SQL procedure successfully completed.
+
+**************************************************(1)**************************************************
+
+
+**************************************************(2)**************************************************
+
+create or replace function VALIDATE_EMP  (p_eno emp.empno%type)  return boolean as
+	eno number:=0;
+begin
+	select count(*) into eno from emp where empno=p_eno;
+	if (eno != 0) then
+		return true;
+	else
+		return false;
+	end if;
+end;
+/
+
+create or replace procedure GET_AVG_SAL (p_eno emp.empno%type) as
+	v_dno emp.deptno%type;
+	avg_sal number;
+	invalid_emp exception;
+begin
+	if validate_emp(p_eno) then
+		select deptno into v_dno from emp where empno=p_eno;
+		select avg(sal) into avg_sal from emp where deptno=v_dno;
+		dbms_output.put_line('Average salary from dept '||v_dno||' is '||avg_sal);
+	else
+		raise invalid_emp;
+	end if;
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+/
+
+create or replace procedure GET_AVG_SAL (p_ename emp.ename%type) as
+	p_eno emp.empno%type;
+	v_dno emp.deptno%type;
+	avg_sal number;
+	invalid_emp exception;
+begin
+	select empno into p_eno from emp where ename=p_ename;
+	if validate_emp(p_eno) then
+		select deptno into v_dno from emp where empno=p_eno;
+		select avg(sal) into avg_sal from emp where deptno=v_dno;
+		dbms_output.put_line('Average salary from dept '||v_dno||' is '||avg_sal);
+	else
+		raise invalid_emp;
+	end if;
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+/
+
+====================================================================================================================
+
+create or replace package MY_EMP_PACK as
+function VALIDATE_EMP  (p_eno emp.empno%type)  return boolean;
+procedure GET_AVG_SAL (p_eno emp.empno%type);
+procedure GET_AVG_SAL (p_ename emp.ename%type);
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body MY_EMP_PACK as
+
+function VALIDATE_EMP  (p_eno emp.empno%type)  return boolean as
+	eno number:=0;
+begin
+	select count(*) into eno from emp where empno=p_eno;
+	if (eno != 0) then
+		return true;
+	else
+		return false;
+	end if;
+end;
+
+ procedure GET_AVG_SAL (p_eno emp.empno%type) as
+	v_dno emp.deptno%type;
+	avg_sal number;
+	invalid_emp exception;
+begin
+	if validate_emp(p_eno) then
+		select deptno into v_dno from emp where empno=p_eno;
+		select avg(sal) into avg_sal from emp where deptno=v_dno;
+		dbms_output.put_line('Average salary from dept '||v_dno||' is '||avg_sal);
+	else
+		raise invalid_emp;
+	end if;
+exception
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+
+ procedure GET_AVG_SAL (p_ename emp.ename%type) as
+	p_eno emp.empno%type;
+	v_dno emp.deptno%type;
+	avg_sal number;
+	invalid_emp exception;
+begin
+	select empno into p_eno from emp where ename=p_ename;
+	if validate_emp(p_eno) then
+		select deptno into v_dno from emp where empno=p_eno;
+		select avg(sal) into avg_sal from emp where deptno=v_dno;
+		dbms_output.put_line('Average salary from dept '||v_dno||' is '||avg_sal);
+	else
+		raise invalid_emp;
+	end if;
+exception
+	when no_data_found then
+	dbms_output.put_line('Invalid employee id');
+	when invalid_emp then
+	dbms_output.put_line('Invalid employee id');
+end;
+
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute MY_EMP_PACK.GET_AVG_SAL(7200);
+
+Average salary from dept 10 is 3562.5
+
+PL/SQL procedure successfully completed.
+
+--------------------------------------------------------
+
+execute MY_EMP_PACK.GET_AVG_SAL(7100);
+
+Invalid employee id
+
+PL/SQL procedure successfully completed.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute MY_EMP_PACK.GET_AVG_SAL('ROONEY');
+
+Average salary from dept 10 is 3562.5
+
+PL/SQL procedure successfully completed.
+
+--------------------------------------------------------
+
+execute MY_EMP_PACK.GET_AVG_SAL('MODRIC');
+
+Invalid employee id
+
+PL/SQL procedure successfully completed.
+
+**************************************************(2)**************************************************
+
+
+**************************************************(3)**************************************************
+
+******
+select plan_id into pid from customers group by plan_id having count(*) = (select max(count(*)) from customers group by plan_id);
+******
+
+create or replace function FIND_PLAN return number as
+	pid number:=0;
+begin
+	select plan_id into pid from customers group by plan_id having count(*) = (select max(count(*)) from customers group by plan_id);
+	return pid;
+end;
+/
+
+create or replace procedure DISPLAY_PLAN as
+	v_maxpid number;
+	v_pn plans.plan_name%type;
+	v_sid plans.service_id%type;
+	v_svn services.service_name%type;
+begin
+	v_maxpid:=FIND_PLAN;
+	select plan_name, service_id into v_pn, v_sid from plans where plan_id=v_maxpid;
+	select service_name into v_svn from services where service_id=v_sid;
+	dbms_output.put_line('Plan ID : '||v_maxpid||' Plan Name : '||v_pn);
+	dbms_output.put_line('Service Name : '||v_svn);
+end;
+/
+
+====================================================================================================================
+
+create or replace package SERVICE_PLAN as
+procedure DISPLAY_PLAN;
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body SERVICE_PLAN as
+
+function FIND_PLAN return number as
+	pid number:=0;
+begin
+	select plan_id into pid from customers group by plan_id having count(*) = (select max(count(*)) from customers group by plan_id);
+	return pid;
+end;
+
+procedure DISPLAY_PLAN as
+	v_maxpid number;
+	v_pn plans.plan_name%type;
+	v_sid plans.service_id%type;
+	v_svn services.service_name%type;
+begin
+	v_maxpid:=FIND_PLAN;
+	select plan_name, service_id into v_pn, v_sid from plans where plan_id=v_maxpid;
+	select service_name into v_svn from services where service_id=v_sid;
+	dbms_output.put_line('Plan ID : '||v_maxpid||' Plan Name : '||v_pn);
+	dbms_output.put_line('Service Name : '||v_svn);
+end;
+
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute service_plan.display_plan;
+
+Plan ID : 8 Plan Name : Unlimited Plan
+Service Name : BB Connection
+
+PL/SQL procedure successfully completed.
+
+**************************************************(3)**************************************************
+
+
+**************************************************(4)**************************************************
+
+create or replace function fnDisplayStatus(p_pid publications.paper_id%type) return varchar2 as
+	ct number:=0;
+	v_st publications.status%type;
+	invalid_paper exception;
+begin
+	select count(*) into ct from publications where paper_id=p_pid;
+	if ct!=0 then
+		select status into v_st from publications where paper_id=p_pid;
+		dbms_output.put_line('Status : '||v_st);
+		return v_st;
+	else
+		return 0;
+		raise invalid_paper;
+	end if;
+
+exception
+	when invalid_paper then
+	dbms_output.put_line('Paper not available');
+end;
+/
+
+declare
+	var_st varchar2(20);
+begin
+	var_st:=fnDisplayStatus('P001');
+	dbms_output.put_line(var_st);
+end;
+/
+
+create or replace procedure prDispCount(p_aid publications.pri_authr_id%type , p_st publications.status%type) as
+	ct number:=0;
+begin
+	select count(*) into ct from publications where pri_authr_id=p_aid and status=p_st;
+	dbms_output.put_line(ct);
+end;
+/
+
+====================================================================================================================
+
+create or replace package pkgDisplay_details as
+function fnDisplayStatus(p_pid publications.paper_id%type) return varchar2;
+procedure prDispCount(p_aid publications.pri_authr_id%type , p_st publications.status%type);
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body pkgDisplay_details as
+
+function fnDisplayStatus(p_pid publications.paper_id%type) return varchar2 as
+	ct number:=0;
+	v_st publications.status%type;
+	invalid_paper exception;
+begin
+	select count(*) into ct from publications where paper_id=p_pid;
+	if ct!=0 then
+		select status into v_st from publications where paper_id=p_pid;
+		return v_st;
+	else
+		raise invalid_paper;
+	end if;
+
+exception
+	when invalid_paper then
+	dbms_output.put_line('Paper not available');
+	return 0;
+end;
+
+procedure prDispCount(p_aid publications.pri_authr_id%type , p_st publications.status%type) as
+	ct number:=0;
+begin
+	select count(*) into ct from publications where pri_authr_id=p_aid and status=p_st;
+	dbms_output.put_line(ct);
+end;
+
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+declare
+	var_st varchar2(20);
+begin
+	var_st:=pkgDisplay_details.fnDisplayStatus('P001');
+	if var_st != 0 then
+		dbms_output.put_line('Status : '||var_st);
+	end if;
+	 pkgDisplay_details.prDispCount('A001','Published');
+end;
+/
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Status : Published
+3
+
+PL/SQL procedure successfully completed.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+declare
+	var_st varchar2(20);
+begin
+	var_st:=pkgDisplay_details.fnDisplayStatus('P009');
+	if var_st != 0 then
+		dbms_output.put_line('Status : '||var_st);
+	end if;
+	 pkgDisplay_details.prDispCount('A001','Published');
+end;
+/
+
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Paper not available
+3
+
+PL/SQL procedure successfully completed.
+
+**************************************************(4)**************************************************
+
+
+**************************************************(5)**************************************************
+
+create or replace function fnGenerateMovieID return varchar2 as
+	v_id number:=0;
+	v_mvid varchar2(10);
+begin
+	v_id:=(sc.nextval);
+	v_mvid:='Mov'||v_id;
+	return v_mvid;
+end;
+/
+	
+	
+
+
+create or replace procedure prNewMovie(p_mvn movie_details.movie_name%type, p_lang movie_details.language%type, p_gen movie_details.genre%type, p_dur movie_details.duration%type, p_dor movie_details.date_of_release%type) as
+	v_movid movie_details.movie_id%type;
+begin
+	v_movid:=fnGenerateMovieID;
+	insert into movie_details values(v_movid,p_mvn,p_lang,p_gen,p_dur,p_dor);
+	dbms_output.put_line('1 row inserted in Movie_details table');
+end;
+/
+
+execute prNewMovie('Avengers','English','Sci-Fi',2.25,'03-NOV-15');
+
+create sequence sc
+start with 108
+increment by 1;
+
+====================================================================================================================
+
+create or replace package Movie_Pack as
+function fnGenerateMovieID return varchar2;
+procedure prNewMovie(p_mvn movie_details.movie_name%type, p_lang movie_details.language%type, p_gen movie_details.genre%type, p_dur movie_details.duration%type, p_dor movie_details.date_of_release%type);
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body Movie_Pack as
+
+function fnGenerateMovieID return varchar2 as
+	v_id number:=0;
+	v_mvid varchar2(10);
+begin
+	v_id:=(sc.nextval);
+	v_mvid:='Mov'||v_id;
+	return v_mvid;
+end;
+
+
+procedure prNewMovie(p_mvn movie_details.movie_name%type, p_lang movie_details.language%type, p_gen movie_details.genre%type, p_dur movie_details.duration%type, p_dor movie_details.date_of_release%type) as
+	v_movid movie_details.movie_id%type;
+begin
+	v_movid:=fnGenerateMovieID;
+	insert into movie_details values(v_movid,p_mvn,p_lang,p_gen,p_dur,p_dor);
+	dbms_output.put_line('1 row inserted in Movie_details table');
+end;
+
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create sequence sc
+start with 108
+increment by 1;
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+execute Movie_Pack.prNewMovie('Avengers 2','English','Sci-Fi',2.60,'03-NOV-15');
+
++++++++++++++++++++++++++++++++++++++++++++++++
+
+1 row inserted in Movie_details table
+
+PL/SQL procedure successfully completed.
+
+**************************************************(5)**************************************************
+
+
+**************************************************(6)**************************************************
+
+create or replace procedure SHOW_DETAILS (p_rtno schedule.route_no%type) as
+	cursor c_sch is select * from schedule where route_no=p_rtno;
+	v_sch c_sch%rowtype;
+begin
+	open c_sch;
+	loop
+		fetch c_sch into v_sch;
+		if c_sch%rowcount = 0 then
+			raise invalid_dept;
+		end if;
+		exit when c_sch%notfound;
+		dbms_output.put_line('Schedule ID is '||v_sch.schedule_id);
+	end loop;
+	close c_sch;
+end;
+/
+
+
+execute show_details('r001');
+
+====================================================================================================================
+
+
+create or replace package PKG_TRANSPORTS as
+	row_not_found exception;
+	pragma exception_init(row_not_found,-20000);
+	var number;
+	procedure SHOW_DETAILS (p_rtno schedule.route_no%type);
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace package body PKG_TRANSPORTS as
+	
+procedure SHOW_DETAILS (p_rtno schedule.route_no%type) as
+		
+	cursor c_sch is select * from schedule where route_no=p_rtno;
+	v_sch c_sch%rowtype;
+begin
+	open c_sch;
+	loop
+		fetch c_sch into v_sch;
+		if c_sch%rowcount = 0 then
+			raise PKG_TRANSPORTS.row_not_found;
+		end if;
+		exit when c_sch%notfound;
+		dbms_output.put_line('Schedule ID is '||v_sch.schedule_id);
+	end loop;
+	close c_sch;
+exception
+	when PKG_TRANSPORTS.row_not_found then
+	dbms_output.put_line('Invalid route number');
+
+end;
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute PKG_TRANSPORTS.show_details('r001');
+
+Schedule ID is s0001
+Schedule ID is s0003
+
+PL/SQL procedure successfully completed.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+execute PKG_TRANSPORTS.show_details('r007');
+
+Invalid route number
+
+PL/SQL procedure successfully completed.
+
+**************************************************(6)**************************************************

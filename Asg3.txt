@@ -1,0 +1,210 @@
+1.
+
+declare
+	v_name emp.ename%type;
+	v_sal emp.sal%type:=&salary;
+begin
+	select ename into v_name from emp where sal=v_sal;
+	dbms_output.put_line('Name is '||v_name);
+	insert into messages values ('Name with sal '||v_sal||' is ' || v_name);
+exception
+	when too_many_rows then
+	insert into messages values ('More than one employee with salary of ' || v_sal);
+	when no_data_found then
+	insert into messages values ('No employee with salary of ' || v_sal);
+	when others then
+	insert into messages values ('Some other error');
+end;
+/
+
+2.
+declare
+	v_did dept.deptno%type;
+	v_dname dept.dname%type;
+	v_loc dept.loc%type;
+	prim_key exception;
+	pragma exception_init(prim_key,-00001);
+begin
+	v_did:=&dno;
+	v_dname:='&dtname';
+	v_loc:='&dloc';
+	insert into dept values(v_did,v_dname,v_loc);
+exception
+	when prim_key then
+	dbms_output.put_line('Department ID already exists');
+end;
+/
+
+3.
+declare
+	ct number:=0;
+	duplicate_president exception;
+begin
+	select count(*) into ct from emp where job='PRESIDENT';
+	if ct > 1 then
+		raise duplicate_president;
+	end if;
+exception
+	when duplicate_president then
+	dbms_output.put_line('More than 1 president');
+end;
+/
+
+4.
+declare
+	v_empno1 emp.empno%type;
+	v_empno2 emp.empno%type;
+	v_name1 emp.ename%type;
+	v_name2 emp.ename%type;
+
+begin
+	v_empno1:=&empno1;
+	v_empno2:=&empno2;
+	begin
+		select ename into v_name1 from emp where empno=v_empno1;
+		dbms_output.put_line('----------Processing----------');
+		update emp set sal=((sal*110)/100) where empno=v_empno1;
+	exception
+		when no_data_found then
+		dbms_output.put_line('Employee with 1st ID does not exist!!');
+	end;
+	select ename into v_name2 from emp where empno=v_empno2;
+	dbms_output.put_line('----------Processing----------');
+	update emp set sal=((sal*120)/100) where empno=v_empno2;
+
+exception
+	when no_data_found then
+	dbms_output.put_line('Employee with 2nd ID does not exist!!');
+end;
+/
+
+OR
+
+declare
+	v_empno1 emp.empno%type;
+	v_empno2 emp.empno%type;
+	v_name1 emp.ename%type;
+	v_name2 emp.ename%type;
+	a number:=0;
+	b number:=0;
+
+begin
+	v_empno1:=&empno1;
+	v_empno2:=&empno2;
+	begin
+		begin
+			select ename into v_name1 from emp where empno=v_empno1;
+			dbms_output.put_line('----------Processing----------');
+			update emp set sal=((sal*110)/100) where empno=v_empno1;
+		exception
+			when no_data_found then
+			a:=1;
+		end;
+	select ename into v_name2 from emp where empno=v_empno2;
+	dbms_output.put_line('----------Processing----------');
+	update emp set sal=((sal*120)/100) where empno=v_empno2;
+
+	exception
+		when no_data_found then
+		b:=1;
+	end;
+if (a=1 and b=1) then
+	dbms_output.put_line('Both employees do not exist');
+elsif (a=0 and b=1) then
+	dbms_output.put_line('Employee 2 does not exist');
+elsif (a=1 and b=0) then
+	dbms_output.put_line('Employee 1 does not exist');
+else
+	dbms_output.put_line('Both employees exist');
+end if;
+end;
+/
+
+5.
+
+declare
+	bk booking.book_id%type;
+	ct number;
+	not_unique_id exception;
+	dt booking.booking_date%type;
+	invalid_date exception;
+	name varchar2(30);
+	theater booking.theartre_id%type;
+	tid number;
+	invalid_theater exception;
+	movie booking.movie_id%type;
+	mid number;
+	invalid_movie exception;
+	show booking.show_id%type;
+	sid number;
+	invalid_show exception;
+	tickets number;
+	more_tickets exception;
+
+begin
+	bk:=&bookingno;
+	select count(*) into ct from booking where book_id=bk;
+	if ct > 0 then
+		raise not_unique_id;
+	end if;
+	
+	dt:=to_date('&date','DD-MM-YYYY');
+	dbms_output.put_line(dt);
+	select sysdate into sysdt from dual;
+	dbms_output.put_line(sysdt);
+	if (trunc(dt) != trunc(sysdt)) then
+		raise invalid_date;
+	end if;
+
+	name:=&booking_name;
+	
+	theater:='&theater_id';
+	select count(theatre_id) into tid from theatre where theatre_id = theater;
+	if tid != 1 then
+		raise invalid_theater;
+	end if;
+
+	movie:='&movie_id';
+	select count(movie_id) into mid from movie_details where movie_id = movie;
+	if mid != 1 then
+		raise invalid_movie;
+	end if;
+
+	show:=&show_id;
+	select count(show_id) into sid from show where show_id = show;
+	if sid != 1 then
+		raise invalid_show;
+	end if;
+
+	tickets:=&no_of_tickets;
+	if tickets > 2 then
+		raise more_tickets;
+	end if;
+
+	insert into book values (bk,name,dt,theater,movie,show,tickets);
+
+exception
+	when not_unique_id then
+	dbms_output.put_line('Booking ID should be unique');
+	when invalid_date then
+	dbms_output.put_line('Booking allowed only for today');
+	when invalid_theater then
+	dbms_output.put_line('Invalid Theater');
+	when invalid_movie then
+	dbms_output.put_line('Invalid Movie');
+	when invalid_show then
+	dbms_output.put_line('Invalid Show');
+	when more_tickets then
+	dbms_output.put_line('Maximum of 2 tickets can be booked');
+end;
+/
+
+
+
+
+
+
+
+
+
+

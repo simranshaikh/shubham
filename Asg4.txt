@@ -1,0 +1,622 @@
+**************************************************(1)**************************************************
+
+create or replace procedure user_query_emp (p_myeno in emp.empno%type, p_myjob out emp.job%type, p_mysal out emp.sal%type) as
+	invalid_empid exception;
+	ct number;
+begin
+	select count(*) into ct from emp where empno=p_myeno;
+	if ct = 0 then
+		raise invalid_empid;
+	else
+		select sal, job into p_mysal, p_myjob from emp where empno=p_myeno;
+	end if;
+exception
+	when invalid_empid then
+	dbms_output.put_line('Emp id is invalid');
+end;
+/
+
+declare
+	v_job emp.job%type;
+	v_sal emp.sal%type;
+begin
+	user_query_emp(1234,v_job,v_sal);
+	if v_sal is not null then
+		dbms_output.put_line('Job is '||v_job);
+		dbms_output.put_line('Salary is '||v_sal);
+	end if;
+end;
+/
+
+Emp id is invalid
+
+PL/SQL procedure successfully completed.
+
+========================================================================
+
+declare
+	v_job emp.job%type;
+	v_sal emp.sal%type;
+begin
+	user_query_emp(7200,v_job,v_sal);
+	if v_sal is not null then
+		dbms_output.put_line('Job is '||v_job);
+		dbms_output.put_line('Salary is '||v_sal);
+	end if;
+end;
+/
+
+Job is PRESIDENT
+Salary is 5500
+
+PL/SQL procedure successfully completed.
+
+**************************************************(1)**************************************************
+
+**************************************************(2)**************************************************
+
+create or replace function USER_ANNUAL_COMP (p_eno emp.empno%type)  return number as
+	p_sal emp.sal%type;
+	p_comm emp.comm%type;
+	annual_compensation number;
+	ct number;
+	invalid_empid exception;
+begin
+	select count(*) into ct from emp where empno=p_eno;
+	if ct = 0 then
+		raise invalid_empid;
+	else
+		select sal, nvl(comm,0) into p_sal, p_comm from emp where empno=p_eno;
+		annual_compensation:=((p_sal+p_comm)*12);
+		return annual_compensation;
+	end if;
+exception
+	when invalid_empid then
+	dbms_output.put_line('Emp id is invalid');
+end;
+/
+
+declare
+	var_num number;
+begin
+	var_num:=user_annual_comp(7200);
+	dbms_output.put_line('Annual comp is : '||var_num);
+end;
+/
+
+Annual comp is : 66000
+
+PL/SQL procedure successfully completed.
+
+=================================================================
+
+declare
+	var_num number;
+begin
+	var_num:=user_annual_comp(1234);
+	dbms_output.put_line('Annual comp is : '||var_num);
+end;
+/
+
+Emp id is invalid
+
+**************************************************(2)**************************************************
+
+
+**************************************************(3)**************************************************
+
+create or replace function USER_VALID_DEPTNO  (p_dno dept.deptno%type)  return boolean as
+	dno number:=0;
+	invalid_dept exception;
+begin
+	select count(*) into dno from dept where deptno=p_dno;
+	if (dno != 0) then
+		return true;
+	else
+		return false;
+	end if;
+end;
+/
+
+create or replace procedure SHOW_STRENGTH (p_deptno dept.deptno%type) as
+	invalid_dept exception;
+	ct number:=0;
+begin
+	if (user_valid_deptno (p_deptno)) then
+		select count(*) into ct from emp where deptno=p_deptno;
+		dbms_output.put_line('Department '||p_deptno||' has '||ct||' employees');
+	else
+		raise invalid_dept;
+	end if;
+
+exception
+	when invalid_dept then
+	dbms_output.put_line('Department not available');
+end;
+/
+
+execute show_strength(10);
+
+Department 10 has 4 employees
+
+PL/SQL procedure successfully completed.
+
+==================================================
+
+execute show_strength(60);
+
+Department not available
+
+PL/SQL procedure successfully completed.
+
+**************************************************(3)**************************************************
+
+
+**************************************************(4)**************************************************
+
+create or replace procedure SHOW_RECORDS (p_join_date VARCHAR2) as
+	dt emp.hiredate%type;
+begin
+	dt:=to_date(p_join_date,'DD-MM-YYYY');
+	
+	declare
+		cursor c_emp is select * from emp where trunc(hiredate) > trunc (dt);
+		v_emp c_emp%rowtype;
+	begin
+		dbms_output.put_line('Employees hired after '||to_char(dt,'DDth, Month YYYY'));
+		dbms_output.put_line('Name'||'      '||'Job'||'      '||'Sal'||'  '||'Dept No');
+		dbms_output.put_line('===========================================');
+		open c_emp;
+		loop
+			fetch c_emp into v_emp;
+			exit when c_emp%notfound;
+			dbms_output.put_line(v_emp.ename||'   '||v_emp.job||'   '||v_emp.sal||'   '||v_emp.deptno);
+		end loop;
+	end;
+end;
+/
+
+execute show_records('21-02-1981');
+
+Employees hired after 21ST, February  1981
+Name      Job      Sal  Dept No
+===========================================
+KING   PRESIDENT   5000   10
+BLAKE   MANAGER   2850   30
+CLARK   MANAGER   2450   10
+JONES   MANAGER   2975   20
+MARTIN   SALESMAN   1250   30
+TURNER   SALESMAN   1500   30
+JAMES   CLERK   950   30
+WARD   SALESMAN   1250   30
+FORD   ANALYST   3000   20
+SCOTT   ANALYST   3000   20
+ADAMS   CLERK   1100   20
+MILLER   CLERK   1300   10
+
+PL/SQL procedure successfully completed.
+
+**************************************************(4)**************************************************
+
+
+**************************************************(5)**************************************************
+
+create or replace procedure ADD_EMPLOYEE (v_job emp.job%type, v_name emp.ename%type, v_mgr emp.mgr%type, v_hdt emp.hiredate%type, v_sal emp.sal%type, v_comm emp.comm%type, v_dno emp.deptno%type) as
+	v_maxno emp.empno%type:=0;
+	dno number:=0;
+	mno number:=0;
+	invalid_job exception;
+	low_sal exception;
+	invalid_dept exception;
+	not_valid_empno exception;
+	date_error exception;
+	commission_error_1 exception;
+	commission_error_2 exception;
+begin
+	select max(empno) into v_maxno from emp;
+	v_maxno:=v_maxno+1;
+	
+	if v_job = 'PROG' or v_job = 'ACC' or v_job = 'PUB_ACC' then
+		dbms_output.put_line('-----Processing-----');
+	else
+		raise invalid_job;
+	end if;
+
+	select count(*) into mno from emp where empno=v_mgr;
+	if (mno != 0) then
+		dbms_output.put_line('-----Processing-----');
+	else
+		raise not_valid_empno;
+	end if;
+
+	if v_hdt < sysdate then
+		dbms_output.put_line('-----Processing-----');
+	else
+		raise date_error;
+	end if;
+
+	if v_sal > 800 then
+		dbms_output.put_line('-----Processing-----');
+	else
+		raise low_sal;
+	end if;
+
+	if v_job = 'ACCOUNTANT' then
+		if v_comm is not null then
+			dbms_output.put_line('-----Processing-----');
+		else
+			raise commission_error_1;
+		end if;
+	else
+		if v_comm is null then
+			dbms_output.put_line('-----Processing-----');
+		else
+			raise commission_error_2;
+		end if;
+	end if;
+
+	select count(*) into dno from dept where deptno=v_dno;
+	if (dno != 0) then
+		dbms_output.put_line('-----Processing-----');
+	else
+		raise invalid_dept;
+	end if;
+
+	insert into emp values(v_maxno,v_name,v_job,v_mgr,v_hdt,v_sal,v_comm,v_dno);
+	dbms_output.put_line('One row inserted');
+
+
+exception
+	when invalid_job then
+	dbms_output.put_line('Job is invalid');
+	when low_sal then
+	dbms_output.put_line('Salary has to be greater than 800');
+	when invalid_dept then
+	dbms_output.put_line('Department not available');
+	when not_valid_empno then
+	dbms_output.put_line('Manager Id is invalid');
+	when date_error then
+	dbms_output.put_line('Hire date should be less than todays date');
+	when commission_error_1 then
+	dbms_output.put_line('Commission cannot be null for accountant');
+	when commission_error_2 then
+	dbms_output.put_line('Commission has to be null');
+end;
+/
+
+
+execute ADD_EMPLOYEE('MANAGER','MARTIAL',1234,'21-JAN-2018',1000,null,10);
+
+Job is invalid
+
+PL/SQL procedure successfully completed.
+
+=======================================================================================
+
+execute ADD_EMPLOYEE('ACC','MARTIAL',1234,'21-JAN-2018',1000,null,10);
+
+-----Processing-----
+Manager Id is invalid
+
+PL/SQL procedure successfully completed.
+
+=======================================================================================
+
+execute ADD_EMPLOYEE('ACC','MARTIAL',7200,'21-JAN-2018',1000,null,10);
+
+-----Processing-----
+-----Processing-----
+Hire date should be less than todays date
+
+PL/SQL procedure successfully completed.
+
+======================================================================================
+
+execute ADD_EMPLOYEE('ACC','MARTIAL',7200,'21-JAN-1981',700,null,10);
+
+-----Processing-----
+-----Processing-----
+-----Processing-----
+Salary has to be greater than 800
+
+PL/SQL procedure successfully completed.
+
+======================================================================================
+
+execute ADD_EMPLOYEE('ACC','MARTIAL',7200,'21-JAN-1981',1000,null,10);
+
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+Commission cannot be null for accountant
+
+PL/SQL procedure successfully completed.
+
+=======================================================================================
+
+execute ADD_EMPLOYEE('PROG','MARTIAL',7200,'21-JAN-1981',1000,100,40);
+
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+Commission has to be null
+
+PL/SQL procedure successfully completed.
+
+============================================================================================
+
+execute ADD_EMPLOYEE('PROGRAMMER','MARTIAL',7200,'21-JAN-1981',1000,null,50);
+
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+Department not available
+
+PL/SQL procedure successfully completed.
+
+========================================================================================
+
+execute ADD_EMPLOYEE('PROG','MARTIAL',7200,'21-JAN-1981',1000,null,40);
+
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+-----Processing-----
+One row inserted
+
+PL/SQL procedure successfully completed.
+
+**************************************************(5)**************************************************
+
+
+**************************************************(6)**************************************************
+
+create or replace procedure Gen_Bill (p_cust_id bill_details.cust_id%type, p_bill_amt bill_details.bill_amount%type, p_bill_date varchar2) as
+	p_bill number;
+	p_bill_no bill_details.bill_no%type;
+	ct number;
+	sysdt bill_details.bill_date%type;
+	invalid_cust exception;
+	more_amount exception;
+	date_invalid exception;
+	p_dt bill_details.bill_date%type;
+begin
+	select count(*) into ct from bill_details where cust_id=p_cust_id;
+	if ct = 0 then
+		raise invalid_cust;
+	end if;
+
+	select substr(max(bill_no),7) into p_bill from bill_details where cust_id=p_cust_id;
+	p_bill:=p_bill + 1;
+	p_bill_no:=p_cust_id||'-B'||to_char(p_bill);
+	
+	if p_bill_amt > 9999 then
+		raise more_amount;
+	end if;
+	
+	select sysdate into sysdt from dual;
+	p_dt:=to_date(p_bill_date,'DD-MM-YYYY');
+	if trunc(sysdt) != trunc (p_dt) then
+		raise date_invalid;
+	end if;
+
+	insert into bill_details values(p_bill_no,p_cust_id,p_bill_amt,p_dt);
+
+exception
+	when invalid_cust then
+	dbms_output.put_line('Invalid customer ID');
+	when more_amount then
+	dbms_output.put_line('Value more than 12000');
+	when date_invalid then
+	dbms_output.put_line('Bill date has to be todays date');
+end;
+/
+
+execute Gen_Bill (1121,5000,'10-04-2017');
+Invalid customer ID
+
+PL/SQL procedure successfully completed.
+
+============================================
+
+execute Gen_Bill (1111,13000,'10-04-2017');
+Value more than 12000
+
+PL/SQL procedure successfully completed.
+
+============================================
+
+execute Gen_Bill (1111,8000,'05-04-2012');
+Bill date has to be todays date
+
+PL/SQL procedure successfully completed.
+
+============================================
+
+execute Gen_Bill (1111,8000,'10-04-2017');
+
+PL/SQL procedure successfully completed.
+
+**************************************************(6)**************************************************
+
+
+
+**************************************************(7)**************************************************
+
+create or replace procedure create_author_details (pri_authr_name scholars.pri_authr_name%type, country scholars.country%type, email_id scholars.email_id%type) as
+	pri_authr_id scholars.pri_authr_id%type;
+	n number:=0;
+	name_blank exception;
+	country_blank exception;
+	invalid_mail_id exception;
+begin
+	if pri_authr_name is null then
+		raise name_blank;
+	end if;
+	
+	if country is null then
+		raise country_blank;
+	end if;
+	if email_id not like '%@%.com' then
+		raise invalid_mail_id;
+	end if;
+	
+	select (substr(max(pri_authr_id),2)) into n from scholars;
+	n:=n+1;
+	if n > 0 and n < 10 then
+		select 'A00'||to_char(n) into pri_authr_id from dual;
+	elsif n > 9 and n < 100 then
+		select 'A0'||to_char(n) into pri_authr_id from dual;
+	elsif n > 99 then
+		select 'A'||to_char(n) into pri_authr_id from dual;
+	end if;
+
+	insert into scholars values (pri_authr_id,pri_authr_name,country,email_id);
+
+exception
+	when name_blank then
+	dbms_output.put_line('Name cannot be blank');
+	when country_blank then
+	dbms_output.put_line('Country cannot be blank');
+	when invalid_mail_id then
+	dbms_output.put_line('Mail id should have @ and .');
+end;
+/
+
+
+execute create_author_details('Mata','Spain','matautd@gmail.com');
+
+PL/SQL procedure successfully completed.
+
+=========================================================s
+
+execute create_author_details(null,'Spain','matautd@gmail.com');
+Name cannot be blank
+
+PL/SQL procedure successfully completed.
+
+=========================================================
+
+execute create_author_details('Mata',null,'matautd@gmail.com');
+Country cannot be blank
+
+PL/SQL procedure successfully completed.
+
+=========================================================
+
+execute create_author_details('Mata','Spain','matautd@gmail');
+Mail id should have @ and .
+
+PL/SQL procedure successfully completed.
+
+
+**************************************************(7)**************************************************
+
+
+
+**************************************************(8)**************************************************
+
+create or replace procedure prGenerateReport(m_id movie_details.movie_id%type) as
+	ct number:=0;
+	invalid_movie exception;
+	v_mname movie_details.movie_name%type;
+	v_lang movie_details.language%type;
+	v_dur movie_details.duration%type;
+begin
+	select count(*) into ct from movie_details where movie_id=m_id;
+	if ct = 0 then
+		raise invalid_movie;
+	end if;
+	select movie_name, language, duration into v_mname, v_lang, v_dur from movie_details where movie_id=m_id;
+	dbms_output.put_line('Movie Name : '||v_mname);
+	dbms_output.put_line('Language : '||v_lang);
+	dbms_output.put_line('Duration : '||v_dur);
+	declare
+		v_tid booking.theartre_id%type;
+		v_sum number;
+		cursor c_dt is select theartre_id, movie_id, sum(no_of_tickets) no_ticket from booking group by theartre_id, movie_id having movie_id in (select movie_id from booking where movie_id=m_id) order by theartre_id;
+		v_dt c_dt%rowtype;
+	begin
+		dbms_output.put_line('Sr. No.   Theatre_ID                           Total_no_of_tickets');
+		open c_dt;
+		loop
+			fetch c_dt into v_dt;
+			exit when c_dt%notfound;
+			dbms_output.put_line(c_dt%rowcount||'             '||v_dt.theartre_id||'                                    '||v_dt.no_ticket);
+		end loop;
+		close c_dt;
+	end;
+exception
+	when invalid_movie then
+	dbms_output.put_line('Invalid Movie ID');
+end;
+/
+
+execute prGenerateReport('Mov104');
+
+Movie Name : 30 Minutes or Less
+Language : English
+Duration : 1.23
+Sr. No.   Theatre_ID                           Total_no_of_tickets
+1             Trt01                                    2
+2             Trt04                                    10
+
+PL/SQL procedure successfully completed.
+
+=======================================================================
+
+execute prGenerateReport('Mov109');
+
+Invalid Movie ID
+
+PL/SQL procedure successfully completed.
+
+=======================================================================
+
+select v_dt.theartre_id, sum(v_dt.no_of_tickets) as v_tid, v_sum from booking group by v_dt.theartre_id, v_dt.movie_id having v_dt.movie_id in (select movie_id from booking where movie_id=m_id) order by v_dt.theartre_id;
+
+select theartre_id, movie_id, sum(no_of_tickets) from booking group by theartre_id, movie_id having movie_id in (select movie_id from booking where movie_id='Mov104') order by theartre_id;
+
+select theartre_id, sum(no_of_tickets) from booking group by theartre_id, movie_id having movie_id in (select movie_id from booking where movie_id='Mov104') order by theartre_id;
+
+select b.theartre_id, t.theatre_name, sum(b.no_of_tickets) from booking b, theatre t where b.theartre_id=t.theatre_id group by b.theartre_id, b.movie_id having b.movie_id in (select movie_id from booking where movie_id='Mov104') order by b.theartre_id;
+
+ select theartre_id, sum(no_of_tickets) into v_tid, v_sum from booking group by theartre_id, movie_id having movie_id in (select movie_id from booking where movie_id=m_id) order by theartre_id;
+
+**************************************************(8)**************************************************
+
+
+
+**************************************************(9)**************************************************
+
+create or replace procedure GET_DETAILS (P_BUS_NO bus.bus_no%type) as
+	v_bt bus.bus_type%type;
+	v_man bus.manufacturer%type;
+begin
+	select bus_type, manufacturer into v_bt, v_man from bus where bus_no=p_bus_no;
+	dbms_output.put_line(v_bt||'   '||v_man);
+exception
+	when no_data_found then
+	dbms_output.put_line('Invalid bus no.');
+end;
+/
+
+execute get_details('MH-50-GH-5675');
+Luxury   Ashoka Leyland
+
+PL/SQL procedure successfully completed.
+
+execute get_details('MH-12-FK-0269');
+Invalid bus no.
+
+PL/SQL procedure successfully completed.
+
+create or replace type p_det (p_bus_type bus.bus_type%type, p_manufacturer bus.manufacturer%type);
+
+**************************************************(9)**************************************************

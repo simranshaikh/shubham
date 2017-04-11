@@ -1,0 +1,150 @@
+1.
+
+declare
+	v_did emp.deptno%type:=&did;
+
+begin
+	update emp set sal=((sal*110)/100) where deptno=v_did;
+	if SQL%found then
+		dbms_output.put_line('Record updated for '||SQL%rowcount||' rows');
+	else
+		dbms_output.put_line('Record not updated');
+	end if;
+end;
+/
+
+
+
+
+2.
+
+-------------for loop-------------
+declare
+cursor c_emp is select ename, sal, job from emp;
+v_emp c_emp%rowtype;
+
+begin
+	open c_emp;
+	for c in 1..5
+	loop
+	fetch c_emp into v_emp;
+		dbms_output.put_line('Ename is '||v_emp.ename||' salary is '||v_emp.sal||' job is '||v_emp.job);
+	end loop;
+	close c_emp;
+end;
+/
+
+-------------while loop-------------
+declare
+cursor c_emp is select ename, sal, job from emp;
+v_emp c_emp%rowtype;
+i number:=1;
+
+begin
+	open c_emp;
+	while (i <= 5)
+	loop
+	fetch c_emp into v_emp;
+		dbms_output.put_line('Ename is '||v_emp.ename||' salary is '||v_emp.sal||' job is '||v_emp.job);
+	i:=i+1;
+	end loop;
+	close c_emp;
+end;
+/
+
+-------------basic loop-------------
+declare
+cursor c_emp is select ename, sal, job from emp;
+v_emp c_emp%rowtype;
+i number:=1;
+
+begin
+	open c_emp;
+	loop
+		fetch c_emp into v_emp;
+		exit when (i = 6);
+		dbms_output.put_line('Ename is '||v_emp.ename||' salary is '||v_emp.sal||' job is '||v_emp.job);
+		i:=i+1;
+	end loop;
+	close c_emp;
+end;
+/
+
+3.
+
+declare
+	cursor c_emp is select * from emp where job='MANAGER';
+	v_emp c_emp%rowtype;
+
+begin
+	open c_emp;
+	loop
+		fetch c_emp into v_emp;
+		exit when c_emp%notfound;
+		dbms_output.put_line('Ename is '||v_emp.ename||' salary is '||v_emp.sal||' job is '||v_emp.job);
+	end loop;
+	close c_emp;
+end;
+/
+
+4.
+
+declare
+	v_job emp.job%type :=&ejob;
+	cursor c_emp is select * from emp where job=v_job;
+	v_emp c_emp%rowtype;
+begin
+	open c_emp;
+	loop
+		fetch c_emp into v_emp;
+		exit when c_emp%notfound;
+		dbms_output.put_line('Ename is '||v_emp.ename||' salary is '||v_emp.sal||' job is '||v_emp.job||' dept no is '||v_emp.deptno);
+	end loop;
+	close c_emp;
+end;
+/
+
+
+5.
+
+declare
+	cursor c_employees is select * from employees for update;
+
+begin
+	for v_employees in c_employees
+	loop
+	if (v_employees.department_id = 10 and v_employees.job_id='SH-CLERK') then
+		update employees set salary=((salary*120)/100) where current of c_employees;
+	elsif (v_employees.department_id = 20 and v_employees.job_id='ST-MAN') then
+		update employees set salary=((salary*105)/100) where current of c_employees;
+	else
+		update employees set salary=((salary*110)/100) where current of c_employees;
+	end if;
+	end loop;
+end;
+/
+
+
+
+
+
+
+
+
+6.
+declare
+	cursor c_dept is select * from dept;
+	cursor c_emp(p_dept number) is select * from emp where deptno=p_dept;
+
+begin
+	for v_dept in c_dept
+	loop
+		dbms_output.put_line(v_dept.deptno||'    '||v_dept.dname||'    ');
+		for v_emp in c_emp(v_dept.deptno)
+		loop
+			dbms_output.put_line(v_emp.empno||'    '|| v_emp.ename||'    '||v_emp.sal||'    '||v_emp.job);
+			
+		end loop;
+	end loop;
+end;
+/

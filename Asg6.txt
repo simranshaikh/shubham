@@ -1,0 +1,325 @@
+**************************************************(1)**************************************************
+
+create or replace type MARKS_TYPE as object(Subject VARCHAR2(25), midTermMarks NUMBER(3), annualMarks NUMBER(3));
+/
+
+create table MYMARKS (marks MARKS_TYPE);
+
+insert into MYMARKS values(MARKS_TYPE('PLSQL',70,70));
+insert into MYMARKS values(MARKS_TYPE('SQL',80,80));
+insert into MYMARKS values(MARKS_TYPE('JEE',90,90));
+
+select m.marks.midTermMarks from MYMARKS m where m.marks.Subject='PLSQL';
+
+select m.marks.annualMarks from MYMARKS m where m.marks.Subject='PLSQL';
+
+**************************************************(1)**************************************************
+
+
+
+**************************************************(2)**************************************************
+
+create or replace type MARKS_TYPE as object(Subject VARCHAR2(25), midTermMarks NUMBER(3), annualMarks NUMBER(3));
+/
+
+create table students (studentName VARCHAR2(25), rollNo NUMBER(3) primary key, score MARKS_TYPE);
+
+insert into students values('Mkhitaryan',101,MARKS_TYPE('PLSQL',70,70));
+insert into students values('Ibrahimovic',102,MARKS_TYPE('PLSQL',80,80));
+insert into students values('Rashford',103,MARKS_TYPE('PLSQL',90,90));
+
+select s.score from students s where rollNo=101;
+
+update students s set s.score.annualMarks=(s.score.annualMarks+5) where rollNo=101;
+
+
+**************************************************(2)**************************************************
+
+
+
+**************************************************(3)**************************************************
+
+create or replace type ICECREAM_TYPE as object(flavorNo NUMBER(2), Fname VARCHAR2(10), Cost NUMBER(3), Hastopping VARCHAR2(1));
+/
+
+create table menu (MenuNo NUMBER(2) primary key, mainCourse VARCHAR2(25), Desert ICECREAM_TYPE, Colddrink VARCHAR2(6));
+
+insert into menu values(11,'varan bhat',ICECREAM_TYPE(1,'mango',40,'n'),'sprite');
+insert into menu values(12,'kadi bhat',ICECREAM_TYPE(2,'pista',30,'y'),'cola');
+insert into menu values(13,'tup bhat',ICECREAM_TYPE(3,'berry',20,'y'),'7up');
+
+select m.desert.Fname, m.desert.cost from menu m where m.desert.flavorNo=2;
+
+update menu set maincourse='poli bhaji' where menuno=12;
+
+update menu m set m.desert.cost=50 where m.menuno=12;
+
+**************************************************(3)**************************************************
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+COLLECTIONS
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+**************************************************(1)**************************************************
+
+create or replace type SKILLS_TYPE as object(SKILL_ID number(2), SKILL_NAME varchar2(20), SKILL_RATING number(2));
+/
+
+create or replace type SKILL_TAB_TYPE as table of SKILLS_TYPE;
+
+
+**************************************************(1)**************************************************
+
+
+
+**************************************************(2)**************************************************
+
+
+create or replace type CUST_TAB as object(cust_id NUMBER(3), cust_name VARCHAR2(20), plan_name varchar2(10));
+/
+
+create or replace type CUST_DETAILS as varray(3) of cust_tab;
+/
+
+
+
+create table Cust_Tab_details (Srno number(10) primary key, Cust_Info cust_details, Cust_number number(10));
+
+insert into Cust_Tab_details values (1,cust_details(cust_tab(1,'Rooney','plan1'),cust_tab(2,'Pogba','plan2'),cust_tab(3,'Carrick','plan3')),123);
+
+insert into Cust_Tab_details values (2,cust_details(cust_tab(1,'Ronaldo','plan4'),cust_tab(2,'Bale','plan5'),cust_tab(3,'James','plan6')),456);
+
+
+declare
+	cursor c1 is select * from cust_tab_details;
+	v_ci cust_details;
+	v_sno number:=0;
+	a number;
+begin
+	for j in c1
+	loop
+	a:=c1%rowcount;
+	select cust_info into v_ci from cust_tab_details where srno=a;
+	select Srno into v_sno from cust_tab_details where srno=a;
+		for i in 1..v_ci.count
+		loop
+			dbms_output.put_line('Sr. No. '||v_sno||' customer details : Cust No.: '||v_ci(i).cust_id||' Name : '||v_ci(i).cust_name||' Plan : '||v_ci(i).plan_name);
+		end loop;
+	end loop;
+end;
+/
+
+**************************************************(2)**************************************************
+
+
+
+**************************************************(3)**************************************************
+
+create or replace type SKILLS_TYPE as object(SKILL_ID number(2), SKILL_NAME varchar2(20), SKILL_RATING number(2));
+/
+
+create or replace type SKILL_TAB_TYPE as table of SKILLS_TYPE;
+/
+
+create table EMPMAIN(EMP_NO number(4) primary key, EMP_NAME varchar2(30), ALL_SKILLS SKILL_TAB_TYPE) nested table ALL_SKILLS store as ALL_SKILLS_TAB;
+
+insert into EMPMAIN values(101,'Vettel',SKILL_TAB_TYPE(SKILLS_TYPE(11,'PLSQL',7),SKILLS_TYPE(12,'SQL',8)));
+insert into EMPMAIN values(102,'Alonso',SKILL_TAB_TYPE(SKILLS_TYPE(21,'JAVA',9)));
+insert into EMPMAIN values(103,'Rosberg',SKILL_TAB_TYPE(SKILLS_TYPE(31,'C',8),SKILLS_TYPE(32,'C++',7),SKILLS_TYPE(33,'UNIX',6)));
+
+---------------------------------------------------
+
+update the (select all_skills from empmain where emp_no=101) set skill_rating=9 where skill_id=11;
+
+---------------------------------------------------
+
+declare
+	cursor c_del is select * from empmain;
+	v_del c_del%rowtype;
+begin
+	open c_del;
+	loop
+		fetch c_del into v_del;
+		exit when c_del%notfound;
+		delete from the (select all_skills from empmain where emp_no=v_del.emp_no) where skill_name is null;
+	end loop;
+	close c_del;
+end;
+/
+
+---------------------------------------------------
+
+create or replace procedure ADD_SKILL (p_eno empmain.emp_no%type, skill_details2 varchar2, skill_details3 number) as
+	skill_details1 number;
+begin
+	select max(skill_id) into skill_details1 from the (select all_skills from empmain where emp_no=p_eno);
+	skill_details1:=skill_details1 + 1;
+	insert into the (select all_skills from empmain where emp_no=p_eno) values  (SKILLS_TYPE(skill_details1,skill_details2,skill_details3));
+	dbms_output.put_line('Skill added');
+end;
+/
+
+
+begin
+	add_skill(103,'UNIX',9);
+end;
+/
+
+**************************************************(3)**************************************************
+
+
+
+**************************************************(4)**************************************************
+
+
+create or replace type VEHICLE_TYPE as object(Vehicle_No VARCHAR2(12), Vehicle_name VARCHAR2(1), Monthly_Expense number(7));
+/
+
+create or replace type VEHICLE_ARR as varray(3) of VEHICLE_TYPE;
+/
+
+create table EMP_VARRAY (Emp_No NUMBER(4) primary key, Emp_Name VARCHAR2(30), vehicleList VEHICLE_ARR);
+
+insert into EMP_VARRAY values(101,'ROONEY',VEHICLE_ARR(VEHICLE_TYPE('ABC123','F',15000)));
+insert into EMP_VARRAY values(102,'MKHITARYAN',VEHICLE_ARR(VEHICLE_TYPE('MNO789','F',10000)));
+
+create or replace procedure ADD_VEHICLE_DETAILS (p_eno emp_varray.emp_no%type, p_vd in out VEHICLE_ARR, p_vdno VARCHAR2, p_vdname VARCHAR2, p_vdme number) as
+	var number;
+begin
+	var:=p_vd.count;
+	p_vd.extend(1);
+	p_vd(var + 1):=VEHICLE_TYPE(p_vdno,p_vdname,p_vdme);
+	update EMP_VARRAY set vehicleList=p_vd where emp_no=p_eno;
+end;
+/
+
+===============================================================================================================
+
+declare
+	v_det VEHICLE_ARR;
+	v_eno emp_varray.emp_no%type:=&empno;
+begin
+	select vehicleList into v_det from EMP_VARRAY where emp_no=v_eno;
+	ADD_VEHICLE_DETAILS(v_eno,v_det,'FGH210','F','8000');
+end;
+
+
+    EMP_NO EMP_NAME
+---------- ------------------------------
+VEHICLELIST(VEHICLE_NO, VEHICLE_NAME, MONTHLY_EXPENSE)
+-------------------------------------------------------------------------------------
+       101 ROONEY
+VEHICLE_ARR(VEHICLE_TYPE('ABC123', 'F', 15000))
+
+       102 MKHITARYAN
+VEHICLE_ARR(VEHICLE_TYPE('ASD234', 'F', 12000), VEHICLE_TYPE('FGH210', 'F', 8000))
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+create or replace procedure ADD_VEHICLE_DETAILS (p_eno emp_varray.emp_no%type, p_vd EMP_VARRAY.vehiclelist%type) as
+	v_eno EMP_VARRAY.Emp_No%type;
+	v_ename EMP_VARRAY.Emp_Name%type;
+	v_vehl EMP_VARRAY.vehiclelist%type;
+	v_arr EMP_VARRAY.vehiclelist%type;
+begin
+	select emp_no, emp_name, vehiclelist into v_eno, v_ename, v_vehl from emp_varray where emp_no=p_eno;
+	v_arr:=(vehicle_arr(vehicle_type(v_vehl)),(vehicle_type(p_vd)));
+	delete from emp_varray where emp_no=p_eno;
+	insert into emp_varray values(v_eno,v_ename,v_arr);
+end;
+/
+
+create or replace procedure ADD_VEHICLE_DETAILS (p_eno emp_varray.emp_no%type, p_vd VEHICLE_ARR) as
+
+begin
+	update emp_varray set vehicleList=p_vd where Emp_No=p_eno;
+end;
+/
+
+declare
+	v_veh vehicle_arr;
+begin
+	v_veh:=vehicle_arr(vehicle_type('ASD234','F',12000));
+	add_vehicle_details(102,v_veh);
+end;
+/
+
+
+	dbms_output.put_line('   '||v_eno||'  '||v_ename||'   '||v_vehl);
+**************************************************(4)**************************************************
+
+
+
+**************************************************(5)**************************************************
+
+create or replace type paper_obj as object(Paper_ID NUMBER(10), Paper_Name VARCHAR2(20), Publish_date date);
+/
+
+create or replace type paper_details as varray(3) of paper_obj;
+/
+
+create table Author_Tab (Author_ID NUMBER(10) primary key, Author_Name VARCHAR2(20), paper paper_details);
+
+insert into Author_Tab values (101,'Rooney',paper_details(paper_obj(10101,'Everton','15-may-2002'), paper_obj(10102,'Man United','05-june-2005')));
+insert into Author_Tab values(102,'Ronaldo',paper_details(paper_obj(10201,'Sporting','15-april-2000'), paper_obj(10202,'Man United','19-june-2002'), paper_obj(10203,'Real Madrid','25-may-2002')));
+
+**************************************************(5)**************************************************
+
+
+
+**************************************************(6)**************************************************
+
+create or replace type SKILLS_TYPE as object(Skill_ID NUMBER(2), Skill_Name VARCHAR2(20), Skill_rating NUMBER(2));
+/
+
+create or replace type INCREMENT_TYPE as object(Incr_ID NUMBER(3), Incr_Date date, Incr_Amt NUMBER(7));
+/
+
+create table EMP_DETAIL (Emp_No NUMBER(4), Emp_Name VARCHAR2(30), Emp_Skills SKILLS_TYPE, Emp_Incr INCREMENT_TYPE);
+
+insert into EMP_DETAIL values (1,'Ronaldo',SKILLS_TYPE(11,'Java',7), INCREMENT_TYPE(101,'12-Nov-2010',9000));
+insert into EMP_DETAIL values (2,'Bale',SKILLS_TYPE(21,'SQL',6), INCREMENT_TYPE(201,'23-Mar-2012',5000));
+
+create or replace procedure DISPLAY_DETAILS (p_eno EMP_DETAIL.Emp_No%type) as
+	v_eno EMP_DETAIL.Emp_No%type;
+	v_ename EMP_DETAIL.Emp_Name%type;
+	v_sid EMP_DETAIL.Emp_Skills.Skill_ID%type;
+	v_sname EMP_DETAIL.Emp_Skills.Skill_Name%type;
+	v_srat EMP_DETAIL.Emp_Skills.Skill_rating%type;
+	v_incid EMP_DETAIL.Emp_Incr.Incr_ID%type;
+	v_idt EMP_DETAIL.Emp_Incr.Incr_Date%type;
+	v_iamt EMP_DETAIL.Emp_Incr.Incr_Amt%type;
+begin
+	select emp_no, emp_name into v_eno, v_ename from emp_detail where emp_no=p_eno;
+	dbms_output.put_line('______________________________________________________');
+	dbms_output.put_line('Employee No.: '||v_eno||'                '||'Employee Name : '||v_ename);
+	select e.emp_skills.skill_id, e.emp_skills.skill_name, e.emp_skills.skill_rating into v_sid, v_sname, v_srat from emp_detail e where emp_no=p_eno;
+	dbms_output.put_line('______________________________________________________');
+	dbms_output.put_line('Skill Set');
+	dbms_output.put_line('Skill ID: '||v_sid||'    '||'Skill Name : '||v_sname||'    '||'Skill Rating : '||v_srat);
+	select e.emp_incr.incr_id, e.emp_incr.incr_date, e.emp_incr.incr_amt into v_incid, v_idt, v_iamt from emp_detail e where emp_no=p_eno;
+	dbms_output.put_line('______________________________________________________');
+	dbms_output.put_line('Increment');
+	dbms_output.put_line('Increment ID: '||v_incid||'    '||'Increment Date : '||v_idt||'    '||'Increment Amount : '||v_iamt);
+	dbms_output.put_line('______________________________________________________');
+end;
+/
+
+execute display_details(1);
+
+______________________________________________________
+Employee No.: 1                Employee Name : Ronaldo
+______________________________________________________
+Skill Set
+Skill ID: 11    Skill Name : Java    Skill Rating : 7
+______________________________________________________
+Increment
+Increment ID: 101    Increment Date : 12-NOV-10    Increment Amount : 9000
+______________________________________________________
+
+PL/SQL procedure successfully completed.
+
+**************************************************(6)**************************************************

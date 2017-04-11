@@ -1,0 +1,166 @@
+**************************************************(4)**************************************************
+
+declare
+	first number:=&num1;
+	second number:=&num2;
+	res number;
+begin
+	res:=(first/(second+second));
+	dbms_output.put_line(res);
+end;
+
+**************************************************(4)**************************************************
+
+
+
+**************************************************(5)**************************************************
+
+declare
+	did emp.deptno%type:=&d;
+	n1 varchar2(20);
+	n2 varchar2(20);
+	max number:=0;
+	min number:=0;	
+
+begin
+	select max(sal) into max from emp group by deptno having deptno=did;
+	select ename into n1 from emp where sal=(select max(sal) from emp group by deptno having deptno=did);
+	select min(sal) into min from emp group by deptno having deptno=did;
+	select ename from emp where sal=(select min(sal) from emp group by deptno having deptno=did);
+	dbms_output.put_line('Name '||n1||' max sal '||max);
+	dbms_output.put_line('Name '||n2||' min sal '||min);
+end;
+/
+
+**************************************************(5)**************************************************
+
+
+
+**************************************************(6)**************************************************
+
+declare
+	jid emp.job%type:=&j;
+	sal number;
+	
+
+begin
+	select avg(sal) into sal from emp where job=jid;
+	dbms_output.put_line('Name = '||jid);
+	dbms_output.put_line('Avg(Sal) = '||sal);
+end;
+/
+
+**************************************************(6)**************************************************
+
+
+
+**************************************************(7)**************************************************
+
+declare
+v_name varchar(20);
+v_sal number;
+v_salgrade varchar(20);
+v_empid number :=&eno;
+begin
+select ename, sal into v_name, v_sal from emp
+where empno =v_empid;
+if (v_sal < 2500) then
+	v_salgrade:='Low';
+elsif (v_sal > 2500 and v_sal < 5000) then
+	v_salgrade:='Medium';
+else
+	v_salgrade:='High';
+end if;
+dbms_output.put_line('Name = '||v_name);
+dbms_output.put_line('Salary = '||v_sal);
+dbms_output.put_line('Salary grade = '||v_salgrade);
+end;
+/
+
+**************************************************(7)**************************************************
+
+
+
+**************************************************(8)**************************************************
+
+declare
+dt number:=&d;
+res varchar2(10);
+
+begin
+if (dt >= 1 and dt <= 12) then
+	select to_char(to_date(dt,'MM'),'Month') into res from dual;
+	dbms_output.put_line('month '||res);
+else
+	dbms_output.put_line('Invalid month');
+end if;
+end;
+/
+
+**************************************************(8)**************************************************
+
+
+
+**************************************************(9)**************************************************
+
+declare
+no number:=&n;
+fact number:=1;
+i number:=1;
+begin
+while (i<=no)
+loop
+	fact:=fact*i;
+	i:=i+1;
+end loop;
+dbms_output.put_line('Factorial is '||fact);
+end;
+/
+
+**************************************************(9)**************************************************
+
+
+
+**************************************************(10)**************************************************
+
+declare
+	v_bill_no bill_details.bill_no%type:=&bill_no;
+	v_cid bill_details.cust_id%type;
+	v_pname plans.plan_name%type;
+	v_bamt bill_details.bill_amount%type;
+	v_sername services.service_name%type;
+begin
+	select b.cust_id, p.plan_name, b.bill_amount, s.service_name into v_cid, v_pname, v_bamt, v_sername from bill_details b, customers c, plans p, services s where b.cust_id=c.cust_id and c.plan_id=p.plan_id and p.service_id=s.service_id and b.bill_no=v_bill_no;
+	dbms_output.put_line('Customer ID : '||v_cid);
+	dbms_output.put_line('Plan Name : '||v_pname);
+	dbms_output.put_line('Bill Amount : '||v_bamt);
+	dbms_output.put_line('Service Name : '||v_sername);
+end;
+/
+
+**************************************************(10)**************************************************
+
+
+
+**************************************************(11)**************************************************
+
+declare
+	v_maxcid customers.cust_id%type;
+	v_pid customers.plan_id%type;
+	v_regdt date;
+	v_ndate date;
+	v_pmode customers.payment_mode%type;
+begin
+	select max(cust_id) into v_maxcid from customers;
+	v_maxcid:=v_maxcid + 1;
+	select plan_id into v_pid from customers group by plan_id having count(*) = (select max(count(*)) from customers group by plan_id);
+	select sysdate into v_regdt from dual;
+	v_ndate:=add_months(v_regdt,1);
+	v_pmode:=&payment_mode;
+	if v_pmode = 'Cash' or v_pmode = 'Credit' or v_pmode = 'Direct debit' then
+		insert into customers values(v_maxcid,v_pid,v_regdt,v_ndate,v_pmode);
+	end if;
+end;
+/
+	
+**************************************************(11)**************************************************
