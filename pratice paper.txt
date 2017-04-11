@@ -1,0 +1,41 @@
+2)
+create or replace procedure show_details(c_mgr emp.empno%type) as
+cursor d1 (p_deptno emp.deptno%type) is select * from emp where mgr=c_mgr;
+d_sal emp.sal%type;
+d_mgr emp.mgr%type;
+v_mgr emp.ename%type;
+dep_no emp.deptno%type;
+d_name dept.dname%type;
+c_emp emp.empno%type;
+begin
+select sal into d_sal from emp where empno=c_mgr;
+dbms_output.put_line(d_sal);
+select ename into v_mgr from emp  where empno=c_mgr;
+dbms_output.put_line('Manager name is'||v_mgr);
+select deptno into dep_no from emp where ename=v_mgr;
+select dname into d_name from dept where deptno=dep_no;
+dbms_output.put_line('department name is'||d_name);
+
+dbms_output.put_line(lpad('-',280,'-'));
+dbms_output.put(rpad('Employee ID',30,' '));
+dbms_output.put(rpad('EmployeeName',30,' '));
+dbms_output.put(rpad('Hiredate',30,' '));
+dbms_output.put_line(rpad('Commission',30,' '));
+dbms_output.put_line(lpad('-',280,'-'));
+
+for s1 in d1(dep_no)
+loop
+dbms_output.put(rpad(s1.empno,30,' '));
+dbms_output.put(rpad(s1.ename,30,' '));
+dbms_output.put(rpad(s1.hiredate,30,' '));
+dbms_output.put_line(rpad(nvl(s1.comm,0),30,' '));
+end loop;
+exception
+when no_data_found then
+dbms_output.put_line('manager id is invalid');
+end;
+/
+
+
+execute show_details(7839);
+
